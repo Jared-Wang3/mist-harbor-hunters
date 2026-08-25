@@ -1,0 +1,12 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "mist-harbor-hunt",
+  "compatibility_date": "2026-08-11",
+  "pages_build_output_dir": "./public",
+  "services": [
+    {
+      "binding": "GAME",
+      "service": "mist-harbor-hunters"
+    }
+  ]
+}

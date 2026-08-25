@@ -1,0 +1,1182 @@
+﻿{
+  "runAt": "2026-08-13T03:43:53.231Z",
+  "baseUrl": "http://127.0.0.1:4317",
+  "desktop": {
+    "console": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "WebSocket connection to 'ws://127.0.0.1:4317/api/rooms/SRKGCS/socket?playerId=f2474b65-e489-4d37-8cbd-aeab6981b92c&token=5lZBRe3allVU7DXS-GnZr6sbCZsCEMcQ' failed: Error during WebSocket handshake: Unexpected response code: 404"
+      }
+    ],
+    "pageErrors": [],
+    "requestFailures": [],
+    "httpErrors": [
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/bot",
+        "status": 404
+      }
+    ],
+    "responses": [
+      {
+        "url": "http://127.0.0.1:4317/",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/cover-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/styles.css",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/arena-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/mark-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/sprites-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/icons-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/app.js",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/client-motion.mjs",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/world-map-v4.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/vanguard-anim-v3.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/crawler-anim-v4.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/ranger-anim-v3.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/brute-anim-v4.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/siren-anim-v4.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/fog-colossus-anim-v4.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/mark-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms",
+        "status": 201
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/bot",
+        "status": 404
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/events?playerId=f2474b65-e489-4d37-8cbd-aeab6981b92c&token=5lZBRe3allVU7DXS-GnZr6sbCZsCEMcQ",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/SRKGCS/input",
+        "status": 202
+      }
+    ],
+    "session": {
+      "roomCode": "SRKGCS",
+      "playerId": "f2474b65-e489-4d37-8cbd-aeab6981b92c",
+      "role": "vanguard"
+    },
+    "assets": {
+      "world-map-v4.webp": {
+        "loaded": true,
+        "width": 1536,
+        "height": 864
+      },
+      "vanguard-anim-v3.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 24538,
+            "ratio": 0.374420166015625
+          },
+          {
+            "row": 1,
+            "changedPixels": 14546,
+            "ratio": 0.221954345703125
+          },
+          {
+            "row": 2,
+            "changedPixels": 30189,
+            "ratio": 0.4606475830078125
+          },
+          {
+            "row": 3,
+            "changedPixels": 29879,
+            "ratio": 0.4559173583984375
+          },
+          {
+            "row": 4,
+            "changedPixels": 25559,
+            "ratio": 0.3899993896484375
+          },
+          {
+            "row": 5,
+            "changedPixels": 25559,
+            "ratio": 0.3899993896484375
+          }
+        ]
+      },
+      "ranger-anim-v3.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 25841,
+            "ratio": 0.3943023681640625
+          },
+          {
+            "row": 1,
+            "changedPixels": 24781,
+            "ratio": 0.3781280517578125
+          },
+          {
+            "row": 2,
+            "changedPixels": 25177,
+            "ratio": 0.3841705322265625
+          },
+          {
+            "row": 3,
+            "changedPixels": 23049,
+            "ratio": 0.3516998291015625
+          },
+          {
+            "row": 4,
+            "changedPixels": 23987,
+            "ratio": 0.3660125732421875
+          },
+          {
+            "row": 5,
+            "changedPixels": 23987,
+            "ratio": 0.3660125732421875
+          }
+        ]
+      },
+      "crawler-anim-v4.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 31428,
+            "ratio": 0.47955322265625
+          },
+          {
+            "row": 1,
+            "changedPixels": 20949,
+            "ratio": 0.3196563720703125
+          },
+          {
+            "row": 2,
+            "changedPixels": 29057,
+            "ratio": 0.4433746337890625
+          },
+          {
+            "row": 3,
+            "changedPixels": 29922,
+            "ratio": 0.456573486328125
+          },
+          {
+            "row": 4,
+            "changedPixels": 29981,
+            "ratio": 0.4574737548828125
+          },
+          {
+            "row": 5,
+            "changedPixels": 29981,
+            "ratio": 0.4574737548828125
+          }
+        ]
+      },
+      "brute-anim-v4.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 26184,
+            "ratio": 0.3995361328125
+          },
+          {
+            "row": 1,
+            "changedPixels": 28274,
+            "ratio": 0.431427001953125
+          },
+          {
+            "row": 2,
+            "changedPixels": 27899,
+            "ratio": 0.4257049560546875
+          },
+          {
+            "row": 3,
+            "changedPixels": 30499,
+            "ratio": 0.4653778076171875
+          },
+          {
+            "row": 4,
+            "changedPixels": 19936,
+            "ratio": 0.30419921875
+          },
+          {
+            "row": 5,
+            "changedPixels": 19936,
+            "ratio": 0.30419921875
+          }
+        ]
+      },
+      "siren-anim-v4.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 24302,
+            "ratio": 0.370819091796875
+          },
+          {
+            "row": 1,
+            "changedPixels": 25414,
+            "ratio": 0.387786865234375
+          },
+          {
+            "row": 2,
+            "changedPixels": 29516,
+            "ratio": 0.45037841796875
+          },
+          {
+            "row": 3,
+            "changedPixels": 30874,
+            "ratio": 0.471099853515625
+          },
+          {
+            "row": 4,
+            "changedPixels": 31533,
+            "ratio": 0.4811553955078125
+          },
+          {
+            "row": 5,
+            "changedPixels": 31533,
+            "ratio": 0.4811553955078125
+          }
+        ]
+      },
+      "fog-colossus-anim-v4.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 39041,
+            "ratio": 0.5957183837890625
+          },
+          {
+            "row": 1,
+            "changedPixels": 32011,
+            "ratio": 0.4884490966796875
+          },
+          {
+            "row": 2,
+            "changedPixels": 42991,
+            "ratio": 0.6559906005859375
+          },
+          {
+            "row": 3,
+            "changedPixels": 34032,
+            "ratio": 0.519287109375
+          },
+          {
+            "row": 4,
+            "changedPixels": 34799,
+            "ratio": 0.5309906005859375
+          },
+          {
+            "row": 5,
+            "changedPixels": 34799,
+            "ratio": 0.5309906005859375
+          }
+        ]
+      }
+    },
+    "mapPatchAudit": {
+      "patches": 12,
+      "uniqueHashes": 12,
+      "hashes": [
+        "bbf8ed33",
+        "bd0be442",
+        "8438a87",
+        "6570d0ea",
+        "8e1eeaa2",
+        "22170f17",
+        "8a72f75a",
+        "53faedf7",
+        "9892e85c",
+        "42e3aab7",
+        "d32a0ffd",
+        "fa32154e"
+      ]
+    },
+    "initial": {
+      "x": 474,
+      "y": 2458,
+      "hp": 150,
+      "area": "猎团营地",
+      "canvasHash": "9337da82ccaaf73a"
+    },
+    "collision": {
+      "first": {
+        "x": 372.6,
+        "y": 2254
+      },
+      "second": {
+        "x": 372.6,
+        "y": 2254
+      },
+      "blockedDelta": 0
+    },
+    "saltMarsh": {
+      "x": 1397.8,
+      "y": 2012.2,
+      "hp": 140,
+      "action": "idle",
+      "area": "盐雾湿地",
+      "enemiesVisibleInState": [
+        {
+          "id": "e2",
+          "type": "crawler",
+          "action": "move",
+          "x": 1338.5,
+          "y": 2022.4
+        },
+        {
+          "id": "e3",
+          "type": "crawler",
+          "action": "idle",
+          "x": 1840,
+          "y": 2420
+        },
+        {
+          "id": "e4",
+          "type": "spitter",
+          "action": "idle",
+          "x": 2020,
+          "y": 2110
+        },
+        {
+          "id": "e5",
+          "type": "spitter",
+          "action": "idle",
+          "x": 1660,
+          "y": 2640
+        },
+        {
+          "id": "e7",
+          "type": "crawler",
+          "action": "idle",
+          "x": 2040,
+          "y": 1460
+        }
+      ]
+    },
+    "attackFrames": {
+      "a": "08346f7660a94282",
+      "b": "2b0c828a0a45e209",
+      "visuallyChanged": true
+    },
+    "resource404s": []
+  },
+  "mobile": {
+    "console": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "WebSocket connection to 'ws://127.0.0.1:4317/api/rooms/K387YQ/socket?playerId=f83cefbb-8710-4c7c-a7bf-426d96926423&token=uwEmhtccBzmBMcX-DNNWXJ0iwvhaFHFd' failed: Error during WebSocket handshake: Unexpected response code: 404"
+      }
+    ],
+    "pageErrors": [],
+    "requestFailures": [],
+    "httpErrors": [
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/K387YQ/bot",
+        "status": 404
+      }
+    ],
+    "responses": [
+      {
+        "url": "http://127.0.0.1:4317/",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/cover-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/styles.css",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/arena-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/sprites-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/icons-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/mark-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/app.js",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/client-motion.mjs",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/world-map-v4.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/ranger-anim-v3.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/vanguard-anim-v3.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/crawler-anim-v4.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/brute-anim-v4.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/siren-anim-v4.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/fog-colossus-anim-v4.png",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/assets/mark-v2.webp",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms",
+        "status": 201
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/K387YQ/bot",
+        "status": 404
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/K387YQ/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/K387YQ/events?playerId=f83cefbb-8710-4c7c-a7bf-426d96926423&token=uwEmhtccBzmBMcX-DNNWXJ0iwvhaFHFd",
+        "status": 200
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/K387YQ/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/K387YQ/input",
+        "status": 202
+      },
+      {
+        "url": "http://127.0.0.1:4317/api/rooms/K387YQ/input",
+        "status": 202
+      }
+    ],
+    "session": {
+      "roomCode": "K387YQ",
+      "playerId": "f83cefbb-8710-4c7c-a7bf-426d96926423",
+      "role": "vanguard"
+    },
+    "layout": {
+      "topbar": {
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 0,
+        "top": 0,
+        "right": 844,
+        "bottom": 38,
+        "width": 844,
+        "height": 38,
+        "insideViewport": true
+      },
+      "canvasFrame": {
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 0,
+        "top": 38,
+        "right": 844,
+        "bottom": 390,
+        "width": 844,
+        "height": 352,
+        "insideViewport": true
+      },
+      "mobileControls": {
+        "display": "flex",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 3,
+        "top": 261,
+        "right": 841,
+        "bottom": 380,
+        "width": 838,
+        "height": 119,
+        "insideViewport": true
+      },
+      "moveStick": {
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 36.75,
+        "top": 298,
+        "right": 118.75,
+        "bottom": 380,
+        "width": 82,
+        "height": 82,
+        "insideViewport": true
+      },
+      "aimStick": {
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 725.25,
+        "top": 298,
+        "right": 807.25,
+        "bottom": 380,
+        "width": 82,
+        "height": 82,
+        "insideViewport": true
+      },
+      "touchDodge": {
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 661.25,
+        "top": 261,
+        "right": 717.25,
+        "bottom": 317,
+        "width": 56,
+        "height": 56,
+        "insideViewport": true
+      },
+      "touchInteract": {
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 661.25,
+        "top": 324,
+        "right": 717.25,
+        "bottom": 380,
+        "width": 56,
+        "height": 56,
+        "insideViewport": true
+      },
+      "objective": {
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 498,
+        "top": 48,
+        "right": 668,
+        "bottom": 88,
+        "width": 170,
+        "height": 40,
+        "insideViewport": true
+      },
+      "exploration": {
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 676,
+        "top": 48,
+        "right": 834,
+        "bottom": 189.71875,
+        "width": 158,
+        "height": 141.71875,
+        "insideViewport": true
+      },
+      "party": {
+        "display": "grid",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 10,
+        "top": 48,
+        "right": 200,
+        "bottom": 143,
+        "width": 190,
+        "height": 95,
+        "insideViewport": true
+      },
+      "orientationHint": {
+        "display": "none",
+        "visibility": "visible",
+        "opacity": "1",
+        "left": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "width": 0,
+        "height": 0,
+        "insideViewport": true
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390,
+        "dpr": 1,
+        "coarse": true
+      },
+      "overlaps": {
+        "moveStick:aimStick": false,
+        "mobileControls:party": false,
+        "mobileControls:objective": false,
+        "mobileControls:exploration": false,
+        "objective:exploration": false,
+        "party:exploration": false
+      }
+    },
+    "assets": {
+      "world-map-v4.webp": {
+        "loaded": true,
+        "width": 1536,
+        "height": 864
+      },
+      "vanguard-anim-v3.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 24538,
+            "ratio": 0.374420166015625
+          },
+          {
+            "row": 1,
+            "changedPixels": 14546,
+            "ratio": 0.221954345703125
+          },
+          {
+            "row": 2,
+            "changedPixels": 30189,
+            "ratio": 0.4606475830078125
+          },
+          {
+            "row": 3,
+            "changedPixels": 29879,
+            "ratio": 0.4559173583984375
+          },
+          {
+            "row": 4,
+            "changedPixels": 25559,
+            "ratio": 0.3899993896484375
+          },
+          {
+            "row": 5,
+            "changedPixels": 25559,
+            "ratio": 0.3899993896484375
+          }
+        ]
+      },
+      "ranger-anim-v3.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 25841,
+            "ratio": 0.3943023681640625
+          },
+          {
+            "row": 1,
+            "changedPixels": 24781,
+            "ratio": 0.3781280517578125
+          },
+          {
+            "row": 2,
+            "changedPixels": 25177,
+            "ratio": 0.3841705322265625
+          },
+          {
+            "row": 3,
+            "changedPixels": 23049,
+            "ratio": 0.3516998291015625
+          },
+          {
+            "row": 4,
+            "changedPixels": 23987,
+            "ratio": 0.3660125732421875
+          },
+          {
+            "row": 5,
+            "changedPixels": 23987,
+            "ratio": 0.3660125732421875
+          }
+        ]
+      },
+      "crawler-anim-v4.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 31428,
+            "ratio": 0.47955322265625
+          },
+          {
+            "row": 1,
+            "changedPixels": 20949,
+            "ratio": 0.3196563720703125
+          },
+          {
+            "row": 2,
+            "changedPixels": 29057,
+            "ratio": 0.4433746337890625
+          },
+          {
+            "row": 3,
+            "changedPixels": 29922,
+            "ratio": 0.456573486328125
+          },
+          {
+            "row": 4,
+            "changedPixels": 29981,
+            "ratio": 0.4574737548828125
+          },
+          {
+            "row": 5,
+            "changedPixels": 29981,
+            "ratio": 0.4574737548828125
+          }
+        ]
+      },
+      "brute-anim-v4.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 26184,
+            "ratio": 0.3995361328125
+          },
+          {
+            "row": 1,
+            "changedPixels": 28274,
+            "ratio": 0.431427001953125
+          },
+          {
+            "row": 2,
+            "changedPixels": 27899,
+            "ratio": 0.4257049560546875
+          },
+          {
+            "row": 3,
+            "changedPixels": 30499,
+            "ratio": 0.4653778076171875
+          },
+          {
+            "row": 4,
+            "changedPixels": 19936,
+            "ratio": 0.30419921875
+          },
+          {
+            "row": 5,
+            "changedPixels": 19936,
+            "ratio": 0.30419921875
+          }
+        ]
+      },
+      "siren-anim-v4.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 24302,
+            "ratio": 0.370819091796875
+          },
+          {
+            "row": 1,
+            "changedPixels": 25414,
+            "ratio": 0.387786865234375
+          },
+          {
+            "row": 2,
+            "changedPixels": 29516,
+            "ratio": 0.45037841796875
+          },
+          {
+            "row": 3,
+            "changedPixels": 30874,
+            "ratio": 0.471099853515625
+          },
+          {
+            "row": 4,
+            "changedPixels": 31533,
+            "ratio": 0.4811553955078125
+          },
+          {
+            "row": 5,
+            "changedPixels": 31533,
+            "ratio": 0.4811553955078125
+          }
+        ]
+      },
+      "fog-colossus-anim-v4.png": {
+        "loaded": true,
+        "width": 2048,
+        "height": 1536,
+        "cell": {
+          "width": 256,
+          "height": 256
+        },
+        "rowFrameDiffs": [
+          {
+            "row": 0,
+            "changedPixels": 39041,
+            "ratio": 0.5957183837890625
+          },
+          {
+            "row": 1,
+            "changedPixels": 32011,
+            "ratio": 0.4884490966796875
+          },
+          {
+            "row": 2,
+            "changedPixels": 42991,
+            "ratio": 0.6559906005859375
+          },
+          {
+            "row": 3,
+            "changedPixels": 34032,
+            "ratio": 0.519287109375
+          },
+          {
+            "row": 4,
+            "changedPixels": 34799,
+            "ratio": 0.5309906005859375
+          },
+          {
+            "row": 5,
+            "changedPixels": 34799,
+            "ratio": 0.5309906005859375
+          }
+        ]
+      }
+    },
+    "resource404s": []
+  },
+  "coop": {
+    "roomCode": "582YGF",
+    "createStatus": 201,
+    "joinStatus": 200,
+    "stage": {
+      "index": 1,
+      "total": 1,
+      "id": "expedition",
+      "title": "雾港远征",
+      "status": "active",
+      "transitionRemaining": 0
+    },
+    "playersFromHost": [
+      {
+        "id": "d4cec717-e596-409b-9133-12d8da07d7e5",
+        "role": "vanguard",
+        "x": 676.1,
+        "y": 2458.4
+      },
+      {
+        "id": "d2c00348-bea0-4e80-9d92-561c5f7076b0",
+        "role": "ranger",
+        "x": 566,
+        "y": 2421.6
+      }
+    ],
+    "playersFromGuest": [
+      {
+        "id": "d4cec717-e596-409b-9133-12d8da07d7e5",
+        "role": "vanguard",
+        "x": 676.1,
+        "y": 2458.4
+      },
+      {
+        "id": "d2c00348-bea0-4e80-9d92-561c5f7076b0",
+        "role": "ranger",
+        "x": 566,
+        "y": 2421.6
+      }
+    ],
+    "hostMoved": 202.10039584325415,
+    "snapshotsAgree": true
+  }
+}

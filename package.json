@@ -1,0 +1,23 @@
+{
+  "name": "mist-harbor-hunters",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "雾港猎团：零依赖双人联机 2D 大地图探索动作游戏",
+  "scripts": {
+    "dev": "node server.mjs",
+    "dev:cloudflare": "wrangler dev",
+    "start": "node server.mjs",
+    "test": "node --test",
+    "test:remote": "node scripts/remote-smoke.mjs",
+    "build:cloudflare": "wrangler deploy --dry-run --outdir dist-worker",
+    "deploy:cloudflare": "wrangler deploy",
+    "deploy:pages": "wrangler pages deploy pages-gateway/public --project-name mist-harbor-hunt --branch main --commit-dirty=true"
+  },
+  "devDependencies": {
+    "wrangler": "4.120.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

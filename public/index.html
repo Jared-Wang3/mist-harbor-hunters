@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      name="description"
+      content="《雾港猎团》是一款双人联机国风俯视角狩猎游戏。结成猎团，与同伴踏浪破雾。"
+    />
+    <meta name="theme-color" content="#fff3cf" />
+    <title>雾港猎团 / MISTHARBOR HUNT</title>
+    <link rel="icon" href="assets/mark-v2.webp" type="image/webp" />
+    <link rel="preload" href="assets/cover-v2.webp" as="image" type="image/webp" />
+    <link rel="preload" href="assets/sprites-v2.webp" as="image" type="image/webp" />
+    <link rel="preload" href="assets/icons-v2.webp" as="image" type="image/webp" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" type="module"></script>
+  </head>
+  <body>
+    <div class="site-shell">
+      <section id="lobbyView" class="lobby-view" aria-labelledby="gameTitle">
+        <img
+          class="cover-art"
+          src="assets/cover-v2.webp"
+          alt="以明亮海蓝、朱橙和暖金套色呈现的国风版画港镇，远处立着猎团钟楼"
+        />
+        <div class="cover-shade" aria-hidden="true"></div>
+        <div class="mist mist-a" aria-hidden="true"></div>
+        <div class="mist mist-b" aria-hidden="true"></div>
+
+        <header class="lobby-header">
+          <a
+            id="homeLink"
+            class="brand"
+            href="#mainMenuPanel"
+            aria-label="返回雾港猎团主菜单"
+            aria-controls="mainMenuPanel"
+          >
+            <img class="brand-mark" src="assets/mark-v2.webp" alt="" aria-hidden="true" />
+            <span>
+              <strong>雾港猎团</strong>
+              <small>MISTHARBOR HUNT</small>
+            </span>
+          </a>
+          <div class="server-status" id="serverStatus" role="status">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="serverStatusText">雾港航路畅通</span>
+          </div>
+        </header>
+
+        <main class="lobby-main">
+          <div class="hero-copy">
+            <p class="eyebrow"><span></span> CO-OP FOLK ADVENTURE <span></span></p>
+            <h1 id="gameTitle">
+              <span>雾港</span>
+              <span class="title-light">猎团</span>
+            </h1>
+            <p class="english-title">MISTHARBOR <b>HUNT</b></p>
+            <p class="hero-intro">
+              钟声三响，晴潮漫过堤岸。<br />两名猎人，一纸契约——穿过盐沼与沉没集市，在迷雾深处找到归港之门。
+            </p>
+            <div class="hunt-tags" aria-label="游戏特性">
+              <span>双人联机</span>
+              <span>协同狩猎</span>
+              <span>大地图探索</span>
+            </div>
+          </div>
+
+          <aside id="mainMenuPanel" class="contract-card main-menu-card" aria-labelledby="mainMenuTitle">
+            <div class="card-corner corner-tl" aria-hidden="true"></div>
+            <div class="card-corner corner-tr" aria-hidden="true"></div>
+            <div class="contract-heading main-menu-heading">
+              <span class="ornament" aria-hidden="true"></span>
+              <div>
+                <h2 id="mainMenuTitle">潮 灯 已 亮</h2>
+                <small>THE HUNT AWAITS</small>
+              </div>
+              <span class="ornament reverse" aria-hidden="true"></span>
+            </div>
+
+            <p class="main-menu-lead">
+              选择独自试炼或与同伴签下契约，循三道潮路深入雾港。你的房间与猎人名号会在进入契约大厅后继续保留。
+            </p>
+
+            <div class="primary-actions main-menu-actions">
+              <button id="startGameBtn" class="action-button action-primary" type="button" aria-controls="contractPanel">
+                <span class="asset-icon icon-contract" aria-hidden="true"></span>
+                <span class="button-copy">
+                  <strong>开始游戏</strong>
+                  <small>ENTER THE COVENANT</small>
+                </span>
+                <span class="button-arrow" aria-hidden="true">›</span>
+              </button>
+              <button id="quickJoinBtn" class="action-button action-secondary" type="button" aria-controls="contractPanel">
+                <span class="asset-icon icon-revive" aria-hidden="true"></span>
+                <span class="button-copy">
+                  <strong>快速加入</strong>
+                  <small>JOIN WITH A ROOM CODE</small>
+                </span>
+                <span class="button-arrow" aria-hidden="true">›</span>
+              </button>
+              <button
+                id="howToPlayBtn"
+                class="action-button action-guide"
+                type="button"
+                aria-haspopup="dialog"
+                aria-controls="howToPlayDialog"
+              >
+                <span class="asset-icon icon-boss" aria-hidden="true"></span>
+                <span class="button-copy">
+                  <strong>玩法与操作</strong>
+                  <small>HUNTER'S FIELD GUIDE</small>
+                </span>
+                <span class="button-arrow" aria-hidden="true">›</span>
+              </button>
+            </div>
+
+            <section class="stage-route-section" aria-labelledby="stageRouteTitle">
+              <div class="stage-route-heading">
+                <h3 id="stageRouteTitle">三章航路预览</h3>
+                <span>雾会散去，地形会留下线索</span>
+              </div>
+              <div class="stage-route-preview">
+                <article class="stage-route-card">
+                  <img
+                    src="assets/world/stage-01/overview-v5.webp"
+                    alt="晴潮雾港航路地形预览"
+                    decoding="async"
+                  />
+                  <div><small>第一章</small><strong>晴潮雾港</strong></div>
+                </article>
+                <article class="stage-route-card">
+                  <img
+                    src="assets/world/stage-02/overview-v1.webp"
+                    alt="赤灯潮市航路地形预览"
+                    decoding="async"
+                  />
+                  <div><small>第二章</small><strong>赤灯潮市</strong></div>
+                </article>
+                <article class="stage-route-card">
+                  <img
+                    src="assets/world/stage-03/overview-v1.webp"
+                    alt="云汐天关航路地形预览"
+                    decoding="async"
+                  />
+                  <div><small>第三章</small><strong>云汐天关</strong></div>
+                </article>
+              </div>
+            </section>
+          </aside>
+
+          <aside id="contractPanel" class="contract-card" aria-labelledby="contractTitle" hidden>
+            <div class="card-corner corner-tl" aria-hidden="true"></div>
+            <div class="card-corner corner-tr" aria-hidden="true"></div>
+            <button id="backToMenuBtn" class="lobby-back-button" type="button" aria-controls="mainMenuPanel">
+              ← 返回主菜单
+            </button>
+            <div class="contract-heading">
+              <span class="ornament" aria-hidden="true"></span>
+              <div>
+                <p id="contractTitle" role="heading" aria-level="2" tabindex="-1">猎 团 契 约</p>
+                <small>HUNTER'S COVENANT</small>
+              </div>
+              <span class="ornament reverse" aria-hidden="true"></span>
+            </div>
+
+            <label class="field-label" for="hunterName">猎人名号 <span>可选</span></label>
+            <div class="input-wrap name-input-wrap">
+              <span class="input-rune" aria-hidden="true">✦</span>
+              <input
+                id="hunterName"
+                type="text"
+                maxlength="12"
+                autocomplete="nickname"
+                placeholder="无名猎人"
+              />
+            </div>
+
+            <div class="primary-actions">
+              <button id="createRoomBtn" class="action-button action-primary" type="button">
+                <span class="asset-icon icon-contract" aria-hidden="true"></span>
+                <span class="button-copy">
+                  <strong>建立双人契约</strong>
+                  <small>CREATE A HUNT</small>
+                </span>
+                <span class="button-arrow" aria-hidden="true">›</span>
+              </button>
+              <button id="soloBtn" class="action-button action-secondary" type="button">
+                <span class="asset-icon icon-boss" aria-hidden="true"></span>
+                <span class="button-copy">
+                  <strong>单人试炼</strong>
+                  <small>SOLO TRIAL · 携灯偶同行</small>
+                </span>
+                <span class="button-arrow" aria-hidden="true">›</span>
+              </button>
+            </div>
+
+            <div class="divider"><span></span><em>或加入现有猎团</em><span></span></div>
+
+            <form id="joinForm" class="join-form">
+              <label class="sr-only" for="roomCodeInput">输入 6 位房间码</label>
+              <input
+                id="roomCodeInput"
+                class="code-input"
+                type="text"
+                inputmode="text"
+                maxlength="6"
+                spellcheck="false"
+                autocomplete="off"
+                placeholder="输入 6 位房间码"
+                aria-describedby="roomCodeHint"
+              />
+              <button id="joinBtn" class="join-button" type="submit">加入猎团</button>
+            </form>
+            <p id="roomCodeHint" class="join-hint">房间码不区分大小写，仅本次狩猎有效</p>
+
+            <div class="role-preview" aria-label="猎人分工">
+              <article>
+                <div class="sprite-portrait sprite-hunter" role="img" aria-label="重刃猎人角色立绘"></div>
+                <div>
+                  <strong>重刃猎人</strong>
+                  <small>近战 · 破甲 · 守护</small>
+                </div>
+                <span class="role-mark amber">壹</span>
+              </article>
+              <span class="role-link" aria-hidden="true">×</span>
+              <article>
+                <div class="sprite-portrait sprite-gunner" role="img" aria-label="符文枪手角色立绘"></div>
+                <div>
+                  <strong>符文枪手</strong>
+                  <small>远程 · 标记 · 控场</small>
+                </div>
+                <span class="role-mark teal">贰</span>
+              </article>
+            </div>
+          </aside>
+        </main>
+
+        <dialog
+          id="howToPlayDialog"
+          class="how-to-dialog"
+          aria-modal="true"
+          aria-labelledby="howToPlayTitle"
+          aria-describedby="howToPlayIntro"
+        >
+          <form method="dialog">
+            <header class="how-to-header">
+              <div>
+                <p class="eyebrow">HUNTER'S FIELD GUIDE</p>
+                <h2 id="howToPlayTitle">猎团出航手册</h2>
+              </div>
+              <button
+                id="closeHowToPlayBtn"
+                class="dialog-close-button"
+                type="submit"
+                value="close"
+                aria-label="关闭玩法与操作说明"
+              >
+                ×
+              </button>
+            </header>
+            <p id="howToPlayIntro" class="how-to-intro">
+              两名猎人共享章节进度。击退沿途妖物、寻找潮印并抵达出口；同伴倒下时，靠近并持续互动即可救援。
+            </p>
+            <div class="how-to-grid">
+              <section aria-labelledby="guideGoalTitle">
+                <span class="guide-number" aria-hidden="true">壹</span>
+                <h3 id="guideGoalTitle">远征目标</h3>
+                <ol>
+                  <li>循小地图探索可通行地形。</li>
+                  <li>清除妖物并收集章节潮印。</li>
+                  <li>全队抵达出口，进入下一章。</li>
+                </ol>
+              </section>
+              <section aria-labelledby="guideDesktopTitle">
+                <span class="guide-number" aria-hidden="true">贰</span>
+                <h3 id="guideDesktopTitle">键盘与鼠标</h3>
+                <ul class="control-list">
+                  <li><kbd>WASD</kbd> 移动</li>
+                  <li><kbd>鼠标</kbd> 瞄准</li>
+                  <li><kbd>左键 / J</kbd> 攻击</li>
+                  <li><kbd>E / K</kbd> 互动与救援</li>
+                  <li><kbd>Shift</kbd> 闪避</li>
+                </ul>
+              </section>
+              <section aria-labelledby="guideMobileTitle">
+                <span class="guide-number" aria-hidden="true">叁</span>
+                <h3 id="guideMobileTitle">触屏与联机</h3>
+                <ul>
+                  <li>左摇杆移动，右摇杆瞄准并攻击。</li>
+                  <li>横屏游玩可获得完整猎场视野。</li>
+                  <li>掉线后保留房间码，重连将返回原猎团。</li>
+                </ul>
+              </section>
+            </div>
+            <div class="dialog-actions">
+              <button class="action-button action-primary" type="submit" value="close">明白了，准备出航</button>
+            </div>
+          </form>
+        </dialog>
+
+        <footer class="lobby-footer">
+          <p><span aria-hidden="true">◆</span> 戴上耳机，循钟声而行</p>
+          <p>WASD 移动 · 鼠标瞄准 · 左键 / J / 空格攻击 · E / K 互动</p>
+        </footer>
+      </section>
+
+      <section id="gameView" class="game-view" aria-label="雾港猎场" hidden>
+        <div class="game-backdrop" aria-hidden="true"></div>
+        <header class="game-topbar">
+          <div class="compact-brand">
+            <img class="brand-mark small" src="assets/mark-v2.webp" alt="" aria-hidden="true" />
+            <span><b>雾港猎团</b><small>MISTHARBOR HUNT</small></span>
+          </div>
+          <div class="room-chip">
+            <span class="asset-icon icon-contract small-icon" aria-hidden="true"></span>
+            <span><small>契约编号</small><strong id="roomCodeDisplay">------</strong></span>
+            <button id="copyCodeBtn" type="button" aria-label="复制房间码">复制</button>
+          </div>
+          <div id="connectionBadge" class="connection-badge is-connecting" role="status">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="connectionText">正在连接雾港…</span>
+          </div>
+          <button id="leaveBtn" class="leave-button" type="button" aria-label="离开当前狩猎">退出猎场</button>
+        </header>
+
+        <main class="game-stage">
+          <p class="orientation-hint" role="status">旋转手机横屏，猎场视野与双摇杆操作会更完整</p>
+          <div id="canvasFrame" class="canvas-frame">
+            <canvas
+              id="gameCanvas"
+              width="1600"
+              height="900"
+              tabindex="0"
+              aria-label="俯视角猎场。使用 WASD 或方向键移动，鼠标瞄准，左键、J 或空格攻击，E 或 K 键互动。"
+            >
+              你的浏览器不支持 Canvas，无法进入雾港猎场。
+            </canvas>
+
+            <div class="vignette" aria-hidden="true"></div>
+
+            <div class="hud-layer" aria-hidden="false">
+              <div class="party-hud" aria-label="队伍状态">
+                <article id="playerCardOne" class="player-card is-local">
+                  <div class="hud-portrait sprite-hunter" role="img" aria-label="重刃猎人"></div>
+                  <div class="player-details">
+                    <p><strong id="playerOneName">等待猎人</strong><span id="playerOneRole">重刃猎人</span></p>
+                    <div class="health-track"><i id="playerOneHealth"></i></div>
+                    <div class="xp-track" aria-label="经验值"><i id="playerOneXp"></i></div>
+                    <div class="player-meta"><span id="playerOneHpText">-- / --</span><em id="playerOneStatus">未签约</em></div>
+                    <b id="playerOneLevel" class="level-chip">Lv.--</b>
+                  </div>
+                </article>
+                <article id="playerCardTwo" class="player-card">
+                  <div class="hud-portrait sprite-gunner" role="img" aria-label="符文枪手"></div>
+                  <div class="player-details">
+                    <p><strong id="playerTwoName">等待猎人</strong><span id="playerTwoRole">符文枪手</span></p>
+                    <div class="health-track teal-track"><i id="playerTwoHealth"></i></div>
+                    <div class="xp-track" aria-label="经验值"><i id="playerTwoXp"></i></div>
+                    <div class="player-meta"><span id="playerTwoHpText">-- / --</span><em id="playerTwoStatus">尚未加入</em></div>
+                    <b id="playerTwoLevel" class="level-chip">Lv.--</b>
+                  </div>
+                </article>
+              </div>
+
+              <section id="bossHud" class="boss-hud" aria-label="首领生命值" hidden>
+                <div class="boss-title"><span></span><p><small id="bossEpithet">潮渊的慈母</small><strong id="bossName">雾港之母</strong></p><span></span></div>
+                <div class="boss-health"><i id="bossHealth"></i><b id="bossHealthLag"></b></div>
+                <p><span id="bossHpText">0 / 0</span><em id="bossPhaseText">第一阶段</em></p>
+              </section>
+
+              <aside class="objective-card" aria-label="当前狩猎目标">
+                <div class="objective-icon asset-icon icon-boss" aria-hidden="true"></div>
+                <div>
+                  <small id="stageLabel">第一幕 · 旧盐巷</small>
+                  <strong id="objectiveTitle">等待钟声</strong>
+                  <p id="objectiveDetail">猎团契约正在生效…</p>
+                </div>
+                <span id="objectiveProgress">0 / 0</span>
+              </aside>
+
+              <aside class="exploration-hud" aria-label="探索地图与远征进度">
+                <div class="minimap-frame">
+                  <canvas id="minimapCanvas" width="200" height="126" aria-label="已探索区域小地图">
+                    浏览器无法显示探索小地图。
+                  </canvas>
+                  <span class="minimap-compass" aria-hidden="true">北</span>
+                </div>
+                <div class="exploration-copy">
+                  <small>当前区域</small><strong id="areaName">迷雾边界</strong>
+                  <p><span id="sealStatus">印记 0 / 3</span><em id="exitStatus">出口尚未显现</em></p>
+                </div>
+              </aside>
+
+              <div id="phaseBanner" class="phase-banner" role="status" hidden>
+                <span></span>
+                <div><small id="phaseEyebrow">猎场异动</small><strong id="phaseTitle">迷雾正在逼近</strong></div>
+                <span></span>
+              </div>
+
+              <div id="waitOverlay" class="wait-overlay" role="status" hidden>
+                <div class="wait-seal"><span class="asset-icon icon-contract" aria-hidden="true"></span></div>
+                <p class="eyebrow"><span></span> COVENANT PENDING <span></span></p>
+                <h2>等待另一位猎人…</h2>
+                <p>将契约编号交给同伴，两人到齐后钟声自会响起。</p>
+                <button id="copyWaitCodeBtn" class="large-code" type="button" aria-label="复制房间码">
+                  <span id="waitRoomCode">------</span><small>点击复制</small>
+                </button>
+                <div class="waiting-pulse"><i></i><i></i><i></i></div>
+              </div>
+
+              <div id="downedNotice" class="downed-notice" role="alert" hidden>
+                <span class="asset-icon icon-revive" aria-hidden="true"></span>
+                <div><strong id="downedTitle">同伴倒下了</strong><p id="downedDetail">靠近并按住 E 进行救援</p></div>
+                <b id="reviveProgress">E</b>
+              </div>
+
+              <div class="skill-hud" aria-label="技能与操作提示">
+                <div class="skill-slot primary-skill">
+                  <span id="primarySkillIcon" class="asset-icon icon-slash" aria-hidden="true"></span>
+                  <kbd>左键</kbd>
+                  <small id="primarySkillName">重刃斩</small>
+                </div>
+                <div class="skill-slot">
+                  <span class="asset-icon icon-revive" aria-hidden="true"></span>
+                  <kbd>E</kbd>
+                  <small>互动 / 救援</small>
+                </div>
+                <div class="skill-slot">
+                  <span class="dodge-glyph" aria-hidden="true">↝</span>
+                  <kbd>Shift</kbd>
+                  <small>闪避</small>
+                </div>
+              </div>
+
+              <div id="mobileControls" class="mobile-controls" aria-label="触屏操作">
+                <div id="moveStick" class="virtual-stick" aria-label="移动摇杆" role="application">
+                  <span id="moveKnob"></span>
+                </div>
+                <div class="right-control-cluster">
+                  <div class="touch-utilities">
+                    <button id="touchDodge" class="touch-button dodge" type="button" aria-label="闪避">闪</button>
+                    <button id="touchInteract" class="touch-button interact" type="button" aria-label="互动或救援">
+                      <span class="asset-icon icon-revive" aria-hidden="true"></span><small>互动</small>
+                    </button>
+                  </div>
+                  <div id="aimStick" class="virtual-stick aim-stick" aria-label="瞄准与攻击摇杆" role="application">
+                    <button id="touchAttack" class="touch-button attack" type="button" aria-label="瞄准与攻击；按住并拖动">
+                      <span id="touchAttackIcon" class="asset-icon icon-slash" aria-hidden="true"></span><small>攻击</small>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <p class="desktop-controls">WASD / 方向键 移动　·　鼠标 瞄准　·　左键 / J / 空格 攻击　·　E / K 互动　·　Shift 闪避</p>
+            </div>
+          </div>
+        </main>
+
+        <section id="resultOverlay" class="result-overlay" role="dialog" aria-modal="true" aria-labelledby="resultTitle" hidden>
+          <div class="result-card">
+            <div id="resultEmblem" class="result-emblem asset-icon icon-boss" aria-hidden="true"></div>
+            <p id="resultEyebrow" class="eyebrow"><span></span> HUNT COMPLETE <span></span></p>
+            <h2 id="resultTitle">狩猎完成</h2>
+            <p id="resultMessage">钟声终于盖过了潮声。今夜，雾港得以安眠。</p>
+            <dl class="result-stats">
+              <div><dt>用时</dt><dd id="resultTime">--:--</dd></div>
+              <div><dt>击倒</dt><dd id="resultKills">--</dd></div>
+              <div><dt>救援</dt><dd id="resultRevives">--</dd></div>
+            </dl>
+            <div class="result-actions">
+              <button id="restartBtn" class="action-button action-primary compact" type="button">再次狩猎</button>
+              <button id="returnLobbyBtn" class="text-button" type="button">返回契约大厅</button>
+            </div>
+          </div>
+        </section>
+      </section>
+    </div>
+
+    <div id="loadingVeil" class="loading-veil" role="status" aria-live="polite" hidden>
+      <div class="loading-mark"><i></i><i></i><i></i></div>
+      <strong id="loadingText">正在书写契约…</strong>
+      <small>请勿离开雾灯照耀的范围</small>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <noscript>请启用 JavaScript 后进入《雾港猎团》。</noscript>
+  </body>
+</html>

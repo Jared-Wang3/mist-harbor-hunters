@@ -1,0 +1,17 @@
+node_modules/
+.wrangler/
+dist-worker/
+npm-debug.log*
+.gstack/
+.env*
+.dev.vars*
+*.pem
+*.key
+.env*
+.dev.vars*
+*.pem
+*.key
+.env*
+.dev.vars*
+*.pem
+*.key
