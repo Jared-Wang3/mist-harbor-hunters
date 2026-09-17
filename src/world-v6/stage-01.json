@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 6,
+  "id": "stage-01",
+  "title": "晴潮雾港",
+  "world": { "width": 5120, "height": 2880 },
+  "spawn": { "x": 520, "y": 2440 },
+  "exit": { "x": 4760, "y": 330, "radius": 118, "holdSeconds": 1 },
+  "boss": { "x": 4380, "y": 650, "zoneId": "fog_heart" },
+  "zones": [
+    { "id": "camp", "name": "猎团营地", "kind": "safe", "x": 80, "y": 1960, "width": 1040, "height": 820, "center": { "x": 520, "y": 2440 }, "hasSeal": false },
+    { "id": "salt_marsh", "name": "盐雾湿地", "kind": "hunt", "x": 760, "y": 1640, "width": 1540, "height": 1160, "center": { "x": 1540, "y": 2240 }, "hasSeal": true },
+    { "id": "sunk_market", "name": "沉没集市", "kind": "hunt", "x": 1740, "y": 680, "width": 1640, "height": 1420, "center": { "x": 2580, "y": 1320 }, "hasSeal": true },
+    { "id": "lighthouse_ruins", "name": "灯塔遗址", "kind": "hunt", "x": 3260, "y": 1320, "width": 1800, "height": 1480, "center": { "x": 4200, "y": 2100 }, "hasSeal": true },
+    { "id": "fog_heart", "name": "潮雾之心", "kind": "boss", "x": 3660, "y": 100, "width": 1400, "height": 1120, "center": { "x": 4380, "y": 650 }, "hasSeal": false }
+  ],
+  "objectives": [
+    { "id": "seal-salt_marsh", "kind": "seal", "zoneId": "salt_marsh", "x": 1960, "y": 2440, "radius": 54 },
+    { "id": "seal-sunk_market", "kind": "seal", "zoneId": "sunk_market", "x": 2920, "y": 1180, "radius": 54 },
+    { "id": "seal-lighthouse_ruins", "kind": "seal", "zoneId": "lighthouse_ruins", "x": 4500, "y": 2040, "radius": 54 }
+  ],
+  "encounterAnchors": [
+    { "zoneId": "salt_marsh", "x": 1080, "y": 2180 },
+    { "zoneId": "salt_marsh", "x": 1420, "y": 1900 },
+    { "zoneId": "salt_marsh", "x": 1780, "y": 2290 },
+    { "zoneId": "salt_marsh", "x": 2050, "y": 1980 },
+    { "zoneId": "sunk_market", "x": 2050, "y": 1540 },
+    { "zoneId": "sunk_market", "x": 2420, "y": 980 },
+    { "zoneId": "sunk_market", "x": 2680, "y": 1650 },
+    { "zoneId": "sunk_market", "x": 3180, "y": 930 },
+    { "zoneId": "lighthouse_ruins", "x": 3500, "y": 2260 },
+    { "zoneId": "lighthouse_ruins", "x": 3890, "y": 2520 },
+    { "zoneId": "lighthouse_ruins", "x": 4330, "y": 2180 },
+    { "zoneId": "lighthouse_ruins", "x": 4780, "y": 1700 }
+  ],
+  "walkablePolygons": [
+    { "id": "harbor-shelf", "surface": "sand-stone", "points": [[80, 1880], [520, 1580], [1200, 1600], [1540, 1380], [1840, 780], [3100, 520], [3480, 760], [3420, 1240], [3760, 1300], [4020, 980], [5000, 980], [5040, 2780], [3300, 2780], [3000, 2380], [2440, 2360], [2140, 2780], [80, 2780]] },
+    { "id": "heart-isle", "surface": "sand-stone", "points": [[3700, 260], [4960, 160], [5040, 1080], [3970, 1080], [3620, 820]] },
+    { "id": "heart-boardwalk", "surface": "boardwalk", "points": [[3470, 860], [3790, 800], [4100, 1300], [3740, 1370]] }
+  ],
+  "surfaceZones": [
+    { "id": "water-base", "surface": "deep-water", "priority": 0, "polygons": [[[0, 0], [5120, 0], [5120, 2880], [0, 2880]]] },
+    { "id": "harbor-land", "surface": "sand-stone", "priority": 10, "polygons": [[[80, 1880], [520, 1580], [1200, 1600], [1540, 1380], [1840, 780], [3100, 520], [3480, 760], [3420, 1240], [3760, 1300], [4020, 980], [5000, 980], [5040, 2780], [3300, 2780], [3000, 2380], [2440, 2360], [2140, 2780], [80, 2780]], [[3700, 260], [4960, 160], [5040, 1080], [3970, 1080], [3620, 820]]] },
+    { "id": "marsh-flats", "surface": "marsh-mud", "priority": 20, "polygons": [[[720, 1740], [2180, 1640], [2320, 2710], [620, 2780]], [[1770, 1260], [2510, 1160], [2600, 1900], [1910, 2020]]] },
+    { "id": "timber-routes", "surface": "boardwalk", "priority": 30, "polygons": [[[300, 2320], [1780, 2220], [1810, 2380], [280, 2480]], [[2180, 1500], [3440, 1240], [3480, 1400], [2240, 1660]], [[3470, 860], [3790, 800], [4100, 1300], [3740, 1370]]] }
+  ],
+  "movementZones": [
+    { "id": "marsh-slow-west", "kind": "slow", "multiplier": 0.82, "polygons": [[[720, 1740], [2180, 1640], [2320, 2710], [620, 2780]]] },
+    { "id": "marsh-slow-market", "kind": "slow", "multiplier": 0.88, "polygons": [[[1770, 1260], [2510, 1160], [2600, 1900], [1910, 2020]]] }
+  ],
+  "blockedRegions": [
+    { "id": "northwest-deep-water", "kind": "deep_water", "shape": "rect", "x": 0, "y": 0, "width": 1660, "height": 1480 },
+    { "id": "west-tidal-inlet", "kind": "deep_water", "shape": "rect", "x": 0, "y": 1240, "width": 470, "height": 640 },
+    { "id": "south-bay", "kind": "deep_water", "shape": "rect", "x": 2380, "y": 2440, "width": 650, "height": 440 },
+    { "id": "center-lagoon", "kind": "deep_water", "shape": "circle", "x": 3240, "y": 1900, "radius": 270 },
+    { "id": "north-channel", "kind": "deep_water", "shape": "rect", "x": 3190, "y": 0, "width": 390, "height": 720 },
+    { "id": "southeast-surge", "kind": "deep_water", "shape": "rect", "x": 4950, "y": 1180, "width": 170, "height": 1700 }
+  ],
+  "props": [
+    { "id": "camp-hunter-hut", "asset": "hunter-hut", "x": 330, "y": 2240, "scale": 1, "anchor": [0.5, 0.88], "collision": { "shape": "rect", "x": 190, "y": 2140, "width": 280, "height": 150 } },
+    { "id": "camp-broken-pier", "asset": "broken-pier", "x": 780, "y": 2700, "scale": 0.92, "anchor": [0.5, 0.88], "collision": { "shape": "rect", "x": 620, "y": 2630, "width": 320, "height": 95 } },
+    { "id": "marsh-reef-west", "asset": "reef-cluster", "x": 1160, "y": 1900, "scale": 0.82, "anchor": [0.5, 0.82], "collision": { "shape": "circle", "x": 1160, "y": 1880, "radius": 88 } },
+    { "id": "marsh-flood-wall", "asset": "flood-wall", "x": 1720, "y": 1820, "scale": 1.05, "anchor": [0.5, 0.82], "collision": { "shape": "rect", "x": 1540, "y": 1760, "width": 360, "height": 95 } },
+    { "id": "market-stall-west", "asset": "market-stall", "x": 2100, "y": 1240, "scale": 0.9, "anchor": [0.5, 0.9], "collision": { "shape": "rect", "x": 1960, "y": 1160, "width": 280, "height": 135 } },
+    { "id": "market-stall-east", "asset": "market-stall", "x": 2910, "y": 1510, "scale": 0.8, "anchor": [0.5, 0.9], "collision": { "shape": "rect", "x": 2780, "y": 1440, "width": 260, "height": 125 } },
+    { "id": "market-reef", "asset": "reef-cluster", "x": 3040, "y": 760, "scale": 0.74, "anchor": [0.5, 0.82], "collision": { "shape": "circle", "x": 3040, "y": 745, "radius": 78 } },
+    { "id": "ruins-flood-wall", "asset": "flood-wall", "x": 3580, "y": 2050, "scale": 1.15, "anchor": [0.5, 0.82], "collision": { "shape": "rect", "x": 3370, "y": 1980, "width": 420, "height": 105 } },
+    { "id": "ruins-broken-pier", "asset": "broken-pier", "x": 4510, "y": 2550, "scale": 1.08, "anchor": [0.5, 0.88], "collision": { "shape": "rect", "x": 4320, "y": 2470, "width": 380, "height": 100 } },
+    { "id": "lighthouse-base", "asset": "lighthouse-base", "x": 4590, "y": 1510, "scale": 1.1, "anchor": [0.5, 0.9], "collision": { "shape": "circle", "x": 4590, "y": 1470, "radius": 128 } },
+    { "id": "heart-reef", "asset": "reef-cluster", "x": 3980, "y": 580, "scale": 0.95, "anchor": [0.5, 0.82], "collision": { "shape": "circle", "x": 3980, "y": 560, "radius": 94 } },
+    { "id": "exit-hut", "asset": "hunter-hut", "x": 4880, "y": 620, "scale": 0.72, "anchor": [0.5, 0.88], "collision": { "shape": "rect", "x": 4770, "y": 550, "width": 220, "height": 120 } }
+  ],
+  "ambientEmitters": [
+    { "id": "west-tide", "kind": "water", "x": 630, "y": 1380, "radius": 760, "speed": 0.42, "intensity": 0.72 },
+    { "id": "marsh-reeds", "kind": "foam", "x": 1500, "y": 2290, "radius": 620, "speed": 0.65, "intensity": 0.58 },
+    { "id": "market-mist", "kind": "fog", "x": 2630, "y": 1260, "radius": 700, "speed": 0.2, "intensity": 0.46 },
+    { "id": "lagoon-tide", "kind": "water", "x": 3240, "y": 1900, "radius": 380, "speed": 0.55, "intensity": 0.8 },
+    { "id": "lighthouse-glow", "kind": "glow", "x": 4580, "y": 1440, "radius": 430, "speed": 0.34, "intensity": 0.72 },
+    { "id": "heart-current", "kind": "foam", "x": 4300, "y": 680, "radius": 710, "speed": 0.74, "intensity": 0.68 }
+  ]
+}

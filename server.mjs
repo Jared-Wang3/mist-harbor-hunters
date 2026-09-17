@@ -10,6 +10,8 @@ const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOM_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const ROOM_CODE_PATTERN = /^[A-HJ-NP-Z2-9]{6}$/;
 const MAX_BODY_BYTES = 16 * 1024;
+const MAX_CATCH_UP_STEPS = 8;
+const STEP_EPSILON = 1e-9;
 
 const MIME_TYPES = Object.freeze({
   '.html': 'text/html; charset=utf-8',
@@ -239,11 +241,30 @@ function validateInput(body) {
     ) return { error: `${key} 必须包含 -1 到 1 之间的 x、y。` };
     result[key] = { x: vector.x ?? 0, y: vector.y ?? 0 };
   }
-  for (const key of ['attack', 'interact', 'dodge']) {
+  for (const key of ['attack', 'interact', 'dodge', 'skill']) {
     if (body[key] !== undefined && typeof body[key] !== 'boolean') return { error: `${key} 必须是布尔值。` };
     result[key] = body[key] === true;
   }
   return { value: result };
+}
+
+function planSimulationFrame(accumulator, elapsedSeconds, stepSeconds) {
+  const carried = Number.isFinite(accumulator) && accumulator > 0 ? accumulator : 0;
+  const elapsed = Number.isFinite(elapsedSeconds) && elapsedSeconds > 0 ? elapsedSeconds : 0;
+  const available = carried + elapsed;
+  const maximum = stepSeconds * MAX_CATCH_UP_STEPS;
+  const bounded = Math.min(available, maximum);
+  const steps = Math.min(
+    MAX_CATCH_UP_STEPS,
+    Math.floor((bounded + STEP_EPSILON) / stepSeconds),
+  );
+  const remainder = bounded - steps * stepSeconds;
+  return {
+    steps,
+    simulatedSeconds: steps * stepSeconds,
+    pendingSeconds: remainder > STEP_EPSILON ? remainder : 0,
+    droppedSeconds: Math.max(0, available - maximum),
+  };
 }
 
 export function createGameServer({
@@ -264,6 +285,9 @@ export function createGameServer({
   let cleanupTimer = null;
   let heartbeatTimer = null;
   let previousTickTime = clock();
+  let simulationAccumulator = 0;
+  let broadcastAccumulator = 0;
+  const simulationStepSeconds = 1 / tickRate;
 
   function closeRoom(record, reason = 'expired') {
     for (const client of record.clients) {
@@ -296,22 +320,29 @@ export function createGameServer({
     }
   }
 
+  function simulationStep() {
+    const current = clock();
+    const measured = (current - previousTickTime) / 1000;
+    previousTickTime = current;
+    const frame = planSimulationFrame(simulationAccumulator, measured, simulationStepSeconds);
+    simulationAccumulator = frame.pendingSeconds;
+    for (let step = 0; step < frame.steps; step += 1) {
+      for (const record of rooms.values()) record.game.update(simulationStepSeconds);
+    }
+    broadcastAccumulator += frame.simulatedSeconds;
+    if (broadcastAccumulator >= 1 / broadcastRate) {
+      broadcastAccumulator %= 1 / broadcastRate;
+      for (const record of rooms.values()) broadcast(record);
+    }
+    return frame;
+  }
+
   function startTimers() {
     if (simulationTimer) return;
     previousTickTime = clock();
-    let broadcastAccumulator = 0;
-    simulationTimer = setInterval(() => {
-      const current = clock();
-      const measured = (current - previousTickTime) / 1000;
-      previousTickTime = current;
-      const dt = measured > 0 && measured < 0.25 ? measured : 1 / tickRate;
-      broadcastAccumulator += dt;
-      for (const record of rooms.values()) record.game.update(dt);
-      if (broadcastAccumulator >= 1 / broadcastRate) {
-        broadcastAccumulator %= 1 / broadcastRate;
-        for (const record of rooms.values()) broadcast(record);
-      }
-    }, 1000 / tickRate);
+    simulationAccumulator = 0;
+    broadcastAccumulator = 0;
+    simulationTimer = setInterval(simulationStep, 1000 / tickRate);
     cleanupTimer = setInterval(cleanupRooms, cleanupIntervalMs);
     heartbeatTimer = setInterval(() => {
       for (const record of rooms.values()) {
@@ -332,6 +363,8 @@ export function createGameServer({
     simulationTimer = null;
     cleanupTimer = null;
     heartbeatTimer = null;
+    simulationAccumulator = 0;
+    broadcastAccumulator = 0;
   }
 
   function rateLimitCreation(request) {
@@ -352,6 +385,12 @@ export function createGameServer({
     }
     session.inputCount += 1;
     return session.inputCount <= 90;
+  }
+
+  function touchSession(record, session) {
+    record.lastActive = clock();
+    session.connected = true;
+    record.game.setConnected(session.playerId, true);
   }
 
   function makeSession(record, { name, role }) {
@@ -516,6 +555,7 @@ export function createGameServer({
           sendError(response, 401, 'invalid_session', '身份令牌无效，请重新加入。');
           return;
         }
+        touchSession(record, session);
         sendJson(response, 200, record.game.snapshot());
         return;
       }
@@ -541,6 +581,7 @@ export function createGameServer({
               return;
             }
             const accepted = record.game.setInput(session.playerId, validated.value, validated.value.seq);
+            touchSession(record, session);
             sendJson(response, accepted ? 202 : 200, { accepted, seq: validated.value.seq });
             return;
           }
@@ -589,6 +630,7 @@ export function createGameServer({
     server,
     rooms,
     cleanupRooms,
+    simulationStep,
     async listen({ port = 0, host = '127.0.0.1' } = {}) {
       if (server.listening) return server.address();
       await new Promise((resolveListen, reject) => {

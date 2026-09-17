@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 6,
+  "id": "stage-03",
+  "title": "云汐天关",
+  "world": { "width": 5120, "height": 2880 },
+  "spawn": { "x": 500, "y": 2440 },
+  "exit": { "x": 4740, "y": 310, "radius": 118, "holdSeconds": 1 },
+  "boss": { "x": 4300, "y": 610, "zoneId": "tide_summit" },
+  "zones": [
+    { "id": "sky_haven", "name": "云舟泊地", "kind": "safe", "x": 80, "y": 1900, "width": 1120, "height": 880, "center": { "x": 500, "y": 2440 }, "hasSeal": false },
+    { "id": "cloud_bridge", "name": "垂云长桥", "kind": "hunt", "x": 760, "y": 1160, "width": 1640, "height": 1620, "center": { "x": 1580, "y": 1840 }, "hasSeal": true },
+    { "id": "storm_terrace", "name": "听雷云台", "kind": "hunt", "x": 1980, "y": 520, "width": 1620, "height": 1500, "center": { "x": 2760, "y": 1260 }, "hasSeal": true },
+    { "id": "celestial_gate", "name": "天关门廊", "kind": "hunt", "x": 3200, "y": 1180, "width": 1840, "height": 1600, "center": { "x": 4140, "y": 2020 }, "hasSeal": true },
+    { "id": "tide_summit", "name": "潮天峰", "kind": "boss", "x": 3540, "y": 80, "width": 1500, "height": 1060, "center": { "x": 4300, "y": 610 }, "hasSeal": false }
+  ],
+  "objectives": [
+    { "id": "seal-cloud_bridge", "kind": "seal", "zoneId": "cloud_bridge", "x": 1980, "y": 1600, "radius": 54 },
+    { "id": "seal-storm_terrace", "kind": "seal", "zoneId": "storm_terrace", "x": 3070, "y": 1110, "radius": 54 },
+    { "id": "seal-celestial_gate", "kind": "seal", "zoneId": "celestial_gate", "x": 4490, "y": 2130, "radius": 54 }
+  ],
+  "encounterAnchors": [
+    { "zoneId": "cloud_bridge", "x": 980, "y": 2210 },
+    { "zoneId": "cloud_bridge", "x": 1370, "y": 1820 },
+    { "zoneId": "cloud_bridge", "x": 1500, "y": 1900 },
+    { "zoneId": "cloud_bridge", "x": 2180, "y": 1520 },
+    { "zoneId": "storm_terrace", "x": 2120, "y": 1040 },
+    { "zoneId": "storm_terrace", "x": 2550, "y": 1510 },
+    { "zoneId": "storm_terrace", "x": 2980, "y": 790 },
+    { "zoneId": "storm_terrace", "x": 3260, "y": 1340 },
+    { "zoneId": "celestial_gate", "x": 3500, "y": 2240 },
+    { "zoneId": "celestial_gate", "x": 3890, "y": 1690 },
+    { "zoneId": "celestial_gate", "x": 4320, "y": 2440 },
+    { "zoneId": "celestial_gate", "x": 4620, "y": 1850 }
+  ],
+  "walkablePolygons": [
+    { "id": "haven-isle", "surface": "heavenly-stone", "points": [[80, 1900], [980, 1780], [1260, 2180], [1080, 2780], [80, 2780]] },
+    { "id": "cloud-bridge-deck", "surface": "bridge-deck", "points": [[900, 1980], [2230, 1250], [2370, 1450], [1080, 2220]] },
+    { "id": "storm-terrace", "surface": "heavenly-stone", "points": [[1980, 700], [3290, 520], [3580, 930], [3440, 1740], [2350, 1870], [1990, 1500]] },
+    { "id": "gate-bridge-deck", "surface": "bridge-deck", "points": [[3290, 1500], [4250, 2080], [4140, 2280], [3180, 1680]] },
+    { "id": "celestial-gate-isle", "surface": "gold-inlay", "points": [[3740, 1420], [5040, 1260], [5040, 2780], [3560, 2780], [3420, 2180]] },
+    { "id": "summit-bridge", "surface": "bridge-deck", "points": [[4040, 1460], [4160, 950], [4380, 980], [4270, 1510]] },
+    { "id": "summit-isle", "surface": "gold-inlay", "points": [[3580, 160], [4980, 100], [5040, 1120], [3820, 1120], [3500, 700]] }
+  ],
+  "surfaceZones": [
+    { "id": "cloud-void-base", "surface": "cloud-void", "priority": 0, "polygons": [[[0, 0], [5120, 0], [5120, 2880], [0, 2880]]] },
+    { "id": "stone-islands", "surface": "heavenly-stone", "priority": 10, "polygons": [[[80, 1900], [980, 1780], [1260, 2180], [1080, 2780], [80, 2780]], [[1980, 700], [3290, 520], [3580, 930], [3440, 1740], [2350, 1870], [1990, 1500]]] },
+    { "id": "golden-gates", "surface": "gold-inlay", "priority": 15, "polygons": [[[3740, 1420], [5040, 1260], [5040, 2780], [3560, 2780], [3420, 2180]], [[3580, 160], [4980, 100], [5040, 1120], [3820, 1120], [3500, 700]]] },
+    { "id": "sky-bridges", "surface": "bridge-deck", "priority": 25, "polygons": [[[900, 1980], [2230, 1250], [2370, 1450], [1080, 2220]], [[3290, 1500], [4250, 2080], [4140, 2280], [3180, 1680]], [[4040, 1460], [4160, 950], [4380, 980], [4270, 1510]]] }
+  ],
+  "movementZones": [
+    { "id": "west-crosswind", "kind": "wind", "multiplier": 0.88, "vector": { "x": 0.28, "y": -0.06 }, "polygons": [[[900, 1750], [2260, 1120], [2460, 1510], [1080, 2340]]] },
+    { "id": "gate-headwind", "kind": "wind", "multiplier": 0.84, "vector": { "x": -0.22, "y": -0.04 }, "polygons": [[[3160, 1400], [4410, 2050], [4140, 2390], [3030, 1700]]] }
+  ],
+  "blockedRegions": [
+    { "id": "southwest-rift", "kind": "cloud_void", "shape": "rect", "x": 1120, "y": 2360, "width": 820, "height": 520 },
+    { "id": "south-center-void", "kind": "cloud_void", "shape": "rect", "x": 2060, "y": 2020, "width": 1320, "height": 860 },
+    { "id": "storm-eye", "kind": "cloud_void", "shape": "circle", "x": 2670, "y": 1210, "radius": 215 },
+    { "id": "north-rift", "kind": "cloud_void", "shape": "rect", "x": 3300, "y": 0, "width": 230, "height": 660 },
+    { "id": "east-void-edge", "kind": "cloud_void", "shape": "rect", "x": 4960, "y": 1180, "width": 160, "height": 1700 }
+  ],
+  "props": [
+    { "id": "haven-sky-dock", "asset": "sky-dock", "x": 260, "y": 2470, "scale": 1.05, "anchor": [0.5, 0.9], "collision": { "shape": "rect", "x": 100, "y": 2380, "width": 320, "height": 150 } },
+    { "id": "west-bridge-anchor", "asset": "bridge-anchor", "x": 1050, "y": 2070, "scale": 0.9, "anchor": [0.5, 0.9], "collision": { "shape": "circle", "x": 1050, "y": 2030, "radius": 92 } },
+    { "id": "cloud-bell-west", "asset": "cloud-bell", "x": 1700, "y": 1820, "scale": 0.86, "anchor": [0.5, 0.94], "collision": { "shape": "circle", "x": 1700, "y": 1760, "radius": 80 } },
+    { "id": "storm-beacon", "asset": "beacon-tower", "x": 2250, "y": 990, "scale": 1.04, "anchor": [0.5, 0.94], "collision": { "shape": "circle", "x": 2250, "y": 930, "radius": 112 } },
+    { "id": "storm-altar", "asset": "heavenly-altar", "x": 3150, "y": 1490, "scale": 0.98, "anchor": [0.5, 0.9], "collision": { "shape": "rect", "x": 3000, "y": 1400, "width": 300, "height": 150 } },
+    { "id": "east-bridge-anchor", "asset": "bridge-anchor", "x": 3420, "y": 1650, "scale": 0.92, "anchor": [0.5, 0.9], "collision": { "shape": "circle", "x": 3420, "y": 1610, "radius": 94 } },
+    { "id": "gate-cloud-bell", "asset": "cloud-bell", "x": 3960, "y": 2350, "scale": 0.92, "anchor": [0.5, 0.94], "collision": { "shape": "circle", "x": 3960, "y": 2285, "radius": 86 } },
+    { "id": "gate-beacon", "asset": "beacon-tower", "x": 4760, "y": 1700, "scale": 1.08, "anchor": [0.5, 0.94], "collision": { "shape": "circle", "x": 4760, "y": 1635, "radius": 116 } },
+    { "id": "summit-altar", "asset": "heavenly-altar", "x": 3890, "y": 720, "scale": 1.12, "anchor": [0.5, 0.9], "collision": { "shape": "rect", "x": 3720, "y": 620, "width": 340, "height": 165 } },
+    { "id": "return-gate", "asset": "return-gate", "x": 4750, "y": 620, "scale": 1.15, "anchor": [0.5, 0.95], "collision": { "shape": "rect", "x": 4540, "y": 520, "width": 420, "height": 165 } }
+  ],
+  "ambientEmitters": [
+    { "id": "haven-clouds", "kind": "cloud", "x": 570, "y": 2120, "radius": 720, "speed": 0.3, "intensity": 0.68 },
+    { "id": "west-crosswind", "kind": "wind", "x": 1620, "y": 1840, "radius": 760, "speed": 0.76, "intensity": 0.78 },
+    { "id": "storm-eye-light", "kind": "glow", "x": 2740, "y": 1180, "radius": 700, "speed": 0.48, "intensity": 0.82 },
+    { "id": "storm-clouds", "kind": "cloud", "x": 3140, "y": 860, "radius": 620, "speed": 0.34, "intensity": 0.72 },
+    { "id": "gate-headwind", "kind": "wind", "x": 3870, "y": 1930, "radius": 820, "speed": 0.82, "intensity": 0.86 },
+    { "id": "summit-aureole", "kind": "glow", "x": 4320, "y": 600, "radius": 760, "speed": 0.26, "intensity": 0.92 }
+  ]
+}

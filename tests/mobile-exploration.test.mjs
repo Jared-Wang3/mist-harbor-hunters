@@ -77,18 +77,19 @@ test('手机游戏区适配真实横竖屏视口，不强制把 16:9 战斗板�
   );
 });
 
-test('探索触控保留攻击、闪避、互动，并允许多指并发而不全局阻断', async () => {
+test('探索触控保留攻击、角色技能、闪避、互动，并允许多指并发', async () => {
   const [html, source] = await Promise.all([
     readFile(path.join(publicRoot, 'index.html'), 'utf8'),
     readFile(path.join(publicRoot, 'app.js'), 'utf8'),
   ]);
 
-  for (const id of ['touchDodge', 'touchInteract']) {
+  for (const id of ['touchSkill', 'touchDodge', 'touchInteract']) {
     assert.match(html, new RegExp(`id=["']${id}["']`, 'i'), `缺少 ${id} 触控按钮`);
   }
   assert.match(source, /pointerdown[\s\S]{0,500}?preventDefault\s*\(\)/i);
   assert.match(source, /pointercancel/i, '系统中断触点时必须释放摇杆/按钮状态');
   assert.match(source, /lostpointercapture/i, '失去触点捕获时必须清理持续攻击或移动');
+  assert.match(source, /bindHoldButton\s*\(\s*ui\.touchSkill\s*,\s*["']skill["']\s*\)/, '触屏技能按钮必须实际绑定 controls.skill');
   assert.doesNotMatch(
     source,
     /document\.addEventListener\s*\(\s*["']touch(?:start|move)["'][\s\S]{0,160}?preventDefault\s*\(\)/i,

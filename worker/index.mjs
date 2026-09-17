@@ -9,6 +9,9 @@ const EMPTY_ROOM_TTL_MS = 5 * 60 * 1000;
 const MAX_ROOM_AGE_MS = 6 * 60 * 60 * 1000;
 const CHECKPOINT_INTERVAL_MS = 2_000;
 const ACTIVITY_FLUSH_INTERVAL_MS = 5_000;
+const SIMULATION_STEP_SECONDS = 1 / TICK_RATE;
+const MAX_CATCH_UP_STEPS = 8;
+const STEP_EPSILON = 1e-9;
 
 const SECURITY_HEADERS = Object.freeze({
   'X-Content-Type-Options': 'nosniff',
@@ -133,7 +136,7 @@ export function validateInput(body) {
     ) return { error: `${key} 必须包含 -1 到 1 之间的 x、y。` };
     value[key] = { x: vector.x ?? 0, y: vector.y ?? 0 };
   }
-  for (const key of ['attack', 'interact', 'dodge']) {
+  for (const key of ['attack', 'interact', 'dodge', 'skill']) {
     if (body[key] !== undefined && typeof body[key] !== 'boolean') {
       return { error: `${key} 必须是布尔值。` };
     }
@@ -183,12 +186,13 @@ export function deserializeGame(serialized, { code, mode, now = Date.now } = {})
   const restoredMode = mode ?? parsed?.mode ?? 'coop';
   const game = new GameState({ code: restoredCode, mode: restoredMode, now });
 
-  if (parsed?.stateVersion === game.stateVersion) {
+  if ([game.stateVersion, 3].includes(parsed?.stateVersion)) {
+    const fromVersion = parsed.stateVersion;
     Object.assign(game, parsed);
-    game.normalizeRestoredState();
+    game.normalizeRestoredState({ fromVersion });
   } else {
     // v1/v2 checkpoints use retired world layouts. Keep reconnect identity for
-    // both and safe numeric growth for v2, but start the new v3 campaign at
+    // both and safe numeric growth for v2, but start the new v4 campaign at
     // stage one instead of assigning incompatible world/objective collections.
     const migratingV2 = parsed?.stateVersion === 2;
     const legacyEntries = parsed?.players instanceof Map
@@ -220,9 +224,7 @@ export function deserializeGame(serialized, { code, mode, now = Date.now } = {})
         migrated.xpToNext = Number.isFinite(legacyPlayer?.xpToNext)
           ? Math.max(1, legacyPlayer.xpToNext)
           : migrated.xpToNext;
-        migrated.power = Number.isFinite(legacyPlayer?.power)
-          ? Math.max(1, legacyPlayer.power)
-          : 1 + (level - 1) * 0.1;
+        migrated.power = 1 + (level - 1) * 0.06;
         migrated.maxHp = Number.isFinite(legacyPlayer?.maxHp)
           ? Math.max(1, legacyPlayer.maxHp)
           : migrated.maxHp;
@@ -231,6 +233,7 @@ export function deserializeGame(serialized, { code, mode, now = Date.now } = {})
         migrated.revives = Number.isFinite(legacyPlayer?.revives) ? Math.max(0, Math.floor(legacyPlayer.revives)) : 0;
       }
     }
+    game.normalizeRestoredState({ fromVersion: parsed?.stateVersion });
   }
 
   game.code = restoredCode;
@@ -253,6 +256,25 @@ function websocketText(data) {
   return '';
 }
 
+function planSimulationFrame(accumulator, elapsedSeconds) {
+  const carried = Number.isFinite(accumulator) && accumulator > 0 ? accumulator : 0;
+  const elapsed = Number.isFinite(elapsedSeconds) && elapsedSeconds > 0 ? elapsedSeconds : 0;
+  const available = carried + elapsed;
+  const maximum = SIMULATION_STEP_SECONDS * MAX_CATCH_UP_STEPS;
+  const bounded = Math.min(available, maximum);
+  const steps = Math.min(
+    MAX_CATCH_UP_STEPS,
+    Math.floor((bounded + STEP_EPSILON) / SIMULATION_STEP_SECONDS),
+  );
+  const remainder = bounded - steps * SIMULATION_STEP_SECONDS;
+  return {
+    steps,
+    simulatedSeconds: steps * SIMULATION_STEP_SECONDS,
+    pendingSeconds: remainder > STEP_EPSILON ? remainder : 0,
+    droppedSeconds: Math.max(0, available - maximum),
+  };
+}
+
 /**
  * One SQLite-backed Durable Object owns exactly one room code. The game loop is
  * deliberately kept resident while a stage is active: a 30 Hz authoritative
@@ -273,11 +295,13 @@ export class GameRoom {
     this.sseClients = new Set();
     this.simulationTimer = null;
     this.previousTickAt = 0;
+    this.simulationAccumulator = 0;
     this.lastCheckpointAt = 0;
     this.lastActivityFlushAt = 0;
     this.broadcastAccumulator = 0;
     this.lastHeartbeatAt = 0;
     this.schemaReady = false;
+    this.clock = Date.now;
 
     const initialize = async () => {
       this.createSchema();
@@ -456,6 +480,8 @@ export class GameRoom {
   async handleState(request, url) {
     const session = this.authenticate(extractCredentials(request, url));
     if (!session) return errorResponse(401, 'invalid_session', '身份令牌无效，请重新加入。');
+    this.touch(session, true);
+    this.advancePollingSimulation();
     return json(this.game.snapshot());
   }
 
@@ -471,6 +497,7 @@ export class GameRoom {
     if (!this.rateLimitInput(session)) return errorResponse(429, 'rate_limited', '输入发送过于频繁。');
     const validated = validateInput(body);
     if (validated.error) return errorResponse(400, 'invalid_input', validated.error);
+    this.advancePollingSimulation();
     const accepted = this.game.setInput(session.playerId, validated.value, validated.value.seq);
     this.touch(session, true);
     return json({ accepted, seq: validated.value.seq }, accepted ? 202 : 200);
@@ -505,6 +532,7 @@ export class GameRoom {
     if (!transition.accepted) {
       return errorResponse(409, 'restart_unavailable', '换关令牌无效，或当前阶段尚未结算。');
     }
+    if (!transition.alreadyApplied) this.resetSimulationClock();
     this.touch(session, true);
     this.persistRoom(true);
     this.startSimulation();
@@ -597,6 +625,7 @@ export class GameRoom {
     if (message.type === 'restart') {
       const transition = this.game.restartCampaign({ transitionToken: message.transitionToken });
       if (transition.accepted) {
+        if (!transition.alreadyApplied) this.resetSimulationClock();
         this.touch(session, true);
         this.persistRoom(true);
         this.startSimulation();
@@ -771,29 +800,54 @@ export class GameRoom {
       || !this.hasLiveTransport()
       || ['waiting', 'stage_complete', 'victory'].includes(this.game.stageStatus)
     ) return;
-    this.previousTickAt = Date.now();
-    this.broadcastAccumulator = 0;
+    this.resetSimulationClock();
     this.simulationTimer = setInterval(() => this.simulationStep(), 1_000 / TICK_RATE);
     this.simulationTimer.unref?.();
   }
 
+  resetSimulationClock() {
+    this.previousTickAt = this.clock();
+    this.simulationAccumulator = 0;
+    this.broadcastAccumulator = 0;
+  }
+
+  advancePollingSimulation() {
+    if (
+      !this.game
+      || this.hasLiveTransport()
+      || ['waiting', 'stage_complete', 'victory'].includes(this.game.stageStatus)
+    ) return;
+    if (!this.previousTickAt) {
+      this.resetSimulationClock();
+      return;
+    }
+    this.simulationStep();
+  }
+
   stopSimulation() {
-    if (!this.simulationTimer) return;
-    clearInterval(this.simulationTimer);
+    if (this.simulationTimer) clearInterval(this.simulationTimer);
     this.simulationTimer = null;
+    this.simulationAccumulator = 0;
   }
 
   simulationStep() {
     if (!this.game) {
       this.stopSimulation();
-      return;
+      return { steps: 0, simulatedSeconds: 0, pendingSeconds: 0, droppedSeconds: 0 };
     }
-    const timestamp = Date.now();
+    const timestamp = this.clock();
     const measured = (timestamp - this.previousTickAt) / 1_000;
     this.previousTickAt = timestamp;
-    const delta = measured > 0 && measured < 0.25 ? measured : 1 / TICK_RATE;
-    this.game.update(delta);
-    this.broadcastAccumulator += delta;
+    const frame = planSimulationFrame(this.simulationAccumulator, measured);
+    this.simulationAccumulator = frame.pendingSeconds;
+    let executedSteps = 0;
+    for (let step = 0; step < frame.steps; step += 1) {
+      this.game.update(SIMULATION_STEP_SECONDS);
+      executedSteps += 1;
+      if (['stage_complete', 'victory'].includes(this.game.stageStatus)) break;
+    }
+    const simulatedSeconds = executedSteps * SIMULATION_STEP_SECONDS;
+    this.broadcastAccumulator += simulatedSeconds;
     if (this.broadcastAccumulator >= 1 / BROADCAST_RATE) {
       this.broadcastAccumulator %= 1 / BROADCAST_RATE;
       this.broadcastSnapshot();
@@ -804,6 +858,12 @@ export class GameRoom {
       this.broadcastSnapshot();
       this.stopSimulation();
     }
+    return {
+      ...frame,
+      steps: executedSteps,
+      simulatedSeconds,
+      pendingSeconds: this.simulationAccumulator,
+    };
   }
 
   broadcastSnapshot() {

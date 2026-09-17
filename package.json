@@ -9,6 +9,8 @@
     "dev:cloudflare": "wrangler dev",
     "start": "node server.mjs",
     "test": "node --test",
+    "build:world-v6": "python -B scripts/build-world-v6.py",
+    "validate:world-v6": "python -B scripts/build-world-v6.py --validate-only",
     "test:remote": "node scripts/remote-smoke.mjs",
     "build:cloudflare": "wrangler deploy --dry-run --outdir dist-worker",
     "deploy:cloudflare": "wrangler deploy",
@@ -18,6 +20,6 @@
     "wrangler": "4.120.1"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.18.3"
   }
 }

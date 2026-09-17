@@ -10,6 +10,20 @@
 - 可读性：人物和怪物以清晰剪影优先，战斗场景中央保持低细节，UI（用户界面）使用不透明纸张色块。
 - 地形：可行走区域、深水、平台边缘与实体障碍必须在正常游戏画面中直接可见，不能依赖 Debug（调试）轮廓才读得懂。
 
+## v6 正式世界系统
+
+v6 以 semantic-first world（语义优先世界）取代旧版整张概念图放大方案。每关的可走路线、深水／运河／云渊阻挡、速度区域、道具脚点与 ambient emitter（环境动态发射器）先定义在 `src/world-v6/stage-0N.json`，地面和前景再从模块化源图生成。以下旧 v5/v1 场景与碰撞图集章节仅保留为历史规格，不再被生产客户端引用。
+
+每关固定包含：
+
+- 4 张至少 1024×1024 的 seamless surface（无缝地表）。
+- 6 张至少 768×768 的 transparent foreground prop（透明前景道具）。
+- 1 张透明 edge decal（边缘贴花）。
+- 16 张 1280×720 地面块、1 张 512×288 概览、1 张 1024×1024 地表图集、1 张 1536×768 前景图集。
+- 16 张 320×180 RGB data texture（RGB 数据纹理），R/G/B 分别承载水或云、岸线或风、光／倒影／环境雾的合成强度；不使用 Alpha 存储数据，避免 Canvas 预乘透明度丢失颜色通道。
+
+运行时严格按「地面 → 世界坐标动态层 → 地面效果 → 道具／敌人／角色脚点纵深 → 环境覆盖 → 战争迷雾 → HUD」绘制。碰撞坐标与可见道具锚点分离：服务端使用 `x/y` 和尺寸，客户端使用 `visualX/visualY`、`anchor` 与 `scale`，避免高建筑的视觉中心破坏碰撞脚点。
+
 ## 色彩令牌
 
 | 用途 | 色值 |
@@ -33,7 +47,7 @@
 3. 攻击
 4. 受伤
 5. 倒地
-6. 预留技能行（当前未由服务端触发）
+6. 职业技能（守潮阵 / 缚潮印）
 
 两个图集统一采用脚底锚点，由客户端按照服务端 `action` / `actionSeq` 与本地移动状态选择动作。`sprites-v2.webp` 中的前两格只保留为头像和加载失败回退。
 
@@ -41,7 +55,7 @@
 
 第二、第三关首领延用同一契约：`lantern-regent-anim-v1.png` 对应赤灯摄政，`tide-tortoise-anim-v1.png` 对应云汐潮甲。角色和首领动画只在真正进入镜头或首领阶段后采用 lazy loading（懒加载），避免手机在开始主页一次解码全部动作表。
 
-## 三关世界场景契约
+## 三关世界场景契约（v5 归档）
 
 三个独立关卡均对应 5120 × 2880 游戏世界，并由同一张母图机械切成 4 × 4 的 WebP（网页图像格式）地图块。每块为 1280 × 720，`row` 与 `column` 均从 0 到 3：
 
@@ -55,9 +69,9 @@
 - `world/stage-02/overview-v1.webp`
 - `world/stage-03/overview-v1.webp`
 
-`overview` 只用于开始主页的三章航路预览、小地图与加载占位，不得放大作为战斗场景铺底。`world-map-v4.webp` 仅保留为旧版归档和加载失败回退。
+这些旧 `overview` 与 `world-map-v4.webp` 仅作历史归档，不得再作为战斗场景、航路预览或加载失败回退。
 
-## 透明碰撞地形契约
+## 透明碰撞地形契约（v5 归档）
 
 正式碰撞地形使用带 Alpha（透明通道）的栅格图集，并按服务端下发的障碍物坐标覆盖在地图块之上。普通玩家必须直接看见实体地形；几何碰撞线只用于调试，不能成为正式画面的唯一提示。
 
@@ -127,16 +141,16 @@
 - 场景、角色与图标必须使用真实栅格美术，不以 SVG（可缩放矢量图形）、圆形或方块代替。
 - 角色图集保持透明背景、足部基线和视角一致，任何部件不得跨格。
 - 移动端静态场景优先输出 WebP；逐帧透明角色图集使用经原图验收的 PNG，避免透明 WebP 编码产生色块。
-- 原始高清 PNG、透明中间件、生成提示词和 QA（质量保证）截图按版本保存在 `art-source/v2/`、`art-source/v3/`、`art-source/v4/` 与 `art-source/v5/`。
-- 三张关卡母图只能通过 `scripts/build-world-tiles.py` 机械导出地图块和概览，禁止逐块手工修图，以免相邻块出现接缝。
-- 地形图集必须四角透明、单元格互不串格；客户端按地形键复用，不为每个障碍重复解码图片。
+- 原始高清 PNG、透明中间件、生成提示词和 QA（质量保证）截图按版本保存在 `art-source/v2/` 至 `art-source/v6/`。
+- v6 三关只能通过 `scripts/build-world-v6.py` 从语义 JSON 与模块源图生成，禁止逐块手工修图；旧 `scripts/build-world-tiles.py` 只负责归档资源。
+- 前景图集必须四角透明、单元格互不串格；客户端按资产键复用，不为每个障碍重复解码图片。
 - 正式运行素材使用带版本号的文件名，避免 CDN（内容分发网络）旧缓存。
 
 ## 移动端资源预算
 
-- 单张 1280 × 720 地图块压缩体积不超过 700 KB；单张概览不超过 160 KB。
+- 单张 1280 × 720 v6 地面块压缩体积不超过 750 KB；单张概览不超过 170 KB。
 - 相机最多保留 4 张可见地图块，并预取至多 1 张相邻块；5 张地图块的 RGBA（红绿蓝透明通道）解码内存约 17.58 MiB。
-- 共用地形图集解码约 4.5 MiB；第二、第三关专属地形各约 4 MiB。
+- 每关地表图集不超过 900 KB，透明前景图集不超过 1.8 MB；动态遮罩按地面块同步加载与释放。
 - 每张首领图集解码约 3 MiB，只在首领阶段加载。
 - 不同时保留两个关卡的地图块或专属地形。预计第一关场景峰值约 22.1 MiB，第二、第三关约 26.1 MiB，首领阶段约 29.1 MiB；以上不含角色图集和画布。
 
@@ -155,26 +169,24 @@
 - `fog-colossus-anim-v4.png`：雾潮巨像首领逐帧动画
 - `lantern-regent-anim-v1.png`：赤灯摄政首领逐帧动画
 - `tide-tortoise-anim-v1.png`：云汐潮甲首领逐帧动画
-- `world/stage-01/map-r{row}-c{column}-v5.webp`：晴潮雾港 4 × 4 地图块
-- `world/stage-01/overview-v5.webp`：晴潮雾港航路概览
-- `world/stage-02/map-r{row}-c{column}-v1.webp`：赤灯潮市 4 × 4 地图块
-- `world/stage-02/overview-v1.webp`：赤灯潮市航路概览
-- `world/stage-03/map-r{row}-c{column}-v1.webp`：云汐天关 4 × 4 地图块
-- `world/stage-03/overview-v1.webp`：云汐天关航路概览
-- `world/terrain-common-v1.webp`：三关共用透明碰撞地形图集
-- `world/stage-02/terrain-stage-02-v1.webp`：赤灯潮市透明碰撞地形图集
-- `world/stage-03/terrain-stage-03-v1.webp`：云汐天关透明碰撞地形图集
-- `world-map-v4.webp`：旧版单图地图（仅归档与加载失败回退）
+- `world/stage-0N/ground-r{row}-c{column}-v6.webp`：三关各 4 × 4 正式地面块
+- `world/stage-0N/overview-v6.webp`：三关正式航路概览
+- `world/stage-0N/surface-v6.webp`：三关各自的 2 × 2 地表图集
+- `world/stage-0N/foreground-v6.webp` 与 `foreground-v6.json`：三关透明前景图集及锚点清单
+- `world/stage-0N/ambient-mask-r{row}-c{column}-v6.png`：三关动态环境遮罩
+- 旧 `map-*-v5/v1`、`terrain-*-v1` 与 `world-map-v4.webp`：仅归档，不作加载失败回退
 
 ## 可复现构建
 
-母图、透明地形母表与首领动作母表保存在 `art-source/v5/`；完整提示词见 `art-source/v5/PROMPTS.md`。在项目根目录执行：
+v6 模块化源图保存在 `art-source/v6/`，完整规则与提示词见 `PIPELINE.md` 和 `PROMPTS.md`。在项目根目录执行：
 
 ```powershell
-python scripts/build-world-tiles.py
+python -m pip install -r requirements-world-v6.txt
+npm run validate:world-v6
+npm run build:world-v6
 ```
 
-可用 `--kind maps`、`--kind terrain` 或 `--kind bosses` 只重建一类资产；地图还可用 `--stage stage-01`、`stage-02` 或 `stage-03` 限定关卡。构建后运行：
+可用 `--stage stage-01`、`stage-02` 或 `stage-03` 限定关卡。旧首领动作母表仍保存在 `art-source/v5/`，需要重建时单独执行 `python scripts/build-world-tiles.py --kind bosses`。构建后运行：
 
 ```powershell
 node --test tests/art-direction.test.mjs

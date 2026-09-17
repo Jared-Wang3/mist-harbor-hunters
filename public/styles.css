@@ -1509,6 +1509,65 @@ a:focus-visible {
   white-space: nowrap;
 }
 
+.role-skill {
+  --skill-cooldown: 0;
+  overflow: hidden;
+}
+
+.role-skill::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 45%;
+  width: clamp(31px, 3.2vw, 44px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: conic-gradient(rgba(9, 25, 23, 0.72) calc(var(--skill-cooldown) * 1turn), transparent 0);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+.role-skill > * {
+  position: relative;
+  z-index: 1;
+}
+
+.role-skill-glyph,
+.touch-skill-glyph {
+  display: grid;
+  place-items: center;
+  color: var(--teal-dark);
+  font-family: var(--serif);
+  font-size: clamp(22px, 2.5vw, 35px);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.skill-cooldown {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 45%;
+  display: none;
+  min-width: 28px;
+  padding: 2px 3px;
+  border: 1px solid rgba(255, 248, 231, 0.72);
+  background: rgba(9, 25, 23, 0.82);
+  color: #fff8e7;
+  font: 800 9px Georgia, serif;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.role-skill.is-cooling .skill-cooldown {
+  display: block;
+}
+
+.role-skill.is-cooling .role-skill-glyph {
+  opacity: 0.42;
+}
+
 .dodge-glyph {
   color: var(--teal);
   font-family: Georgia, serif;
@@ -1847,6 +1906,31 @@ noscript {
     grid-row: 1;
     font-family: var(--serif);
     font-size: clamp(15px, 2vw, 21px);
+  }
+
+  .touch-button.skill {
+    position: relative;
+    overflow: hidden;
+    border-color: rgba(44, 154, 174, 0.62);
+    background: radial-gradient(circle, rgba(31, 113, 125, 0.68), rgba(13, 48, 48, 0.86));
+  }
+
+  .touch-button.skill.is-cooling .touch-skill-glyph {
+    opacity: 0.38;
+  }
+
+  .touch-skill-cooldown {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    background: rgba(7, 18, 16, 0.62);
+    color: #fff8e7;
+    font: 900 12px Georgia, serif;
+  }
+
+  .touch-button.skill.is-cooling .touch-skill-cooldown {
+    display: grid;
   }
 
   .touch-button .asset-icon {
@@ -2814,6 +2898,16 @@ a:focus-visible {
   filter: grayscale(0.55);
 }
 
+.player-card.is-guarding {
+  border-left-color: var(--teal-dark);
+  box-shadow: 4px 4px 0 var(--teal-dark), 0 0 0 3px rgba(44, 154, 174, 0.24);
+}
+
+.player-card.is-skill-active {
+  border-left-color: var(--amber-bright);
+  box-shadow: 4px 4px 0 var(--amber), 0 0 0 3px rgba(244, 189, 69, 0.28);
+}
+
 .player-details > p span,
 .player-meta {
   color: var(--muted);
@@ -3059,6 +3153,11 @@ a:focus-visible {
 
   .touch-button.interact {
     background: var(--teal);
+  }
+
+  .touch-button.skill {
+    background: #ffd56a;
+    color: var(--ink);
   }
 
   .touch-button.dodge {

@@ -4,6 +4,8 @@ import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
+import { GAME_STAGES } from '../src/game-stages.mjs';
+
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const publicRoot = path.join(projectRoot, 'public');
 const assetsRoot = path.join(publicRoot, 'assets');
@@ -125,6 +127,76 @@ test('三关地图均机械导出 4×4 高清地图块和独立概览', async ()
     assert.ok(overview.length >= 8_000, stage.directory + '/' + overviewName + ' 体积过小');
     assert.ok(overview.length <= 160_000, stage.directory + '/' + overviewName + ' 超过主页概览预算');
   }
+});
+
+test('v6 三关使用独立语义地形、碰撞与随机遭遇规则', async () => {
+  const worlds = await Promise.all(GAME_STAGES.map(async (stage) => {
+    const source = await readFile(path.join(projectRoot, 'src', 'world-v6', `${stage.id}.json`), 'utf8');
+    return JSON.parse(source);
+  }));
+
+  assert.equal(new Set(GAME_STAGES.map((stage) => stage.geometryHash)).size, 3, '三关不得复用同一几何');
+  assert.equal(new Set(worlds.map((world) => JSON.stringify(world.walkablePolygons))).size, 3);
+  assert.equal(new Set(worlds.map((world) => JSON.stringify(world.blockedRegions))).size, 3);
+  assert.deepEqual(GAME_STAGES.map((stage) => stage.encounterRules.countRange), [[8, 11], [10, 13], [12, 15]]);
+  assert.deepEqual(GAME_STAGES.map((stage) => stage.encounterRules.xpBudget), [645, 785, 865]);
+
+  for (const [index, world] of worlds.entries()) {
+    const stage = GAME_STAGES[index];
+    assert.equal(world.schemaVersion, 6);
+    assert.equal(world.zones.length, 5);
+    assert.equal(world.objectives.length, 3);
+    assert.ok(world.encounterAnchors.length >= 12);
+    assert.equal(new Set(world.surfaceZones.map((zone) => zone.surface)).size, 4);
+    assert.ok(world.props.length >= 10, `${stage.id} 应有足够的独立前景层次`);
+    assert.ok(world.ambientEmitters.length >= 6, `${stage.id} 应有足够的动态环境发射器`);
+    assert.ok(stage.obstacles.some((obstacle) => obstacle.terrainBoundary), `${stage.id} 缺少不可通行地形`);
+    assert.ok(stage.obstacles.filter((obstacle) => obstacle.visualKind === 'v6-prop').length >= 10);
+    assert.equal(stage.encounterRules.perZoneMaterializedTarget, 7);
+    assert.equal(stage.encounterRules.globalMaterializedCap, 21);
+    assert.equal(stage.encounterRules.globalAwakeCap, 14);
+  }
+});
+
+test('v6 模块化世界资源满足切片、透明前景与动态遮罩契约', async () => {
+  for (const stage of GAME_STAGES) {
+    const stageRoot = path.join(worldAssetsRoot, stage.id);
+    for (let row = 0; row < 4; row += 1) {
+      for (let column = 0; column < 4; column += 1) {
+        const groundName = `ground-r${row}-c${column}-v6.webp`;
+        const ground = await readFile(path.join(stageRoot, groundName));
+        assert.deepEqual(readWebpSize(ground), { width: 1280, height: 720 });
+        assert.ok(ground.length >= 40_000, `${stage.id}/${groundName} 疑似空白`);
+        assert.ok(ground.length <= 750_000, `${stage.id}/${groundName} 超出预算`);
+
+        const maskName = `ambient-mask-r${row}-c${column}-v6.png`;
+        const mask = readPngInfo(await readFile(path.join(stageRoot, maskName)));
+        assert.deepEqual(mask, { width: 320, height: 180, hasAlpha: false });
+      }
+    }
+
+    const overview = await readFile(path.join(stageRoot, 'overview-v6.webp'));
+    assert.deepEqual(readWebpSize(overview), { width: 512, height: 288 });
+    assert.ok(overview.length <= 170_000);
+
+    const surface = await readFile(path.join(stageRoot, 'surface-v6.webp'));
+    assert.deepEqual(readWebpSize(surface), { width: 1024, height: 1024 });
+    assert.ok(surface.length <= 900_000);
+
+    const foreground = await readFile(path.join(stageRoot, 'foreground-v6.webp'));
+    assert.deepEqual(readWebpSize(foreground), { width: 1536, height: 768 });
+    assert.ok(webpHasAlpha(foreground), `${stage.id} 前景图集必须保留 Alpha`);
+    assert.ok(foreground.length <= 1_800_000);
+
+    const manifest = JSON.parse(await readFile(path.join(stageRoot, 'foreground-v6.json'), 'utf8'));
+    assert.equal(manifest.version, 6);
+    assert.equal(Object.keys(manifest.assets).length, 6);
+  }
+});
+
+test('v6 世界构建固定 Pillow 版本，干净环境可复现安装', async () => {
+  const requirements = await readFile(path.join(projectRoot, 'requirements-world-v6.txt'), 'utf8');
+  assert.equal(requirements.trim(), 'Pillow==12.3.0');
 });
 
 test('正式碰撞地形图集使用透明 WebP，普通画面可按障碍键绘制', async () => {
@@ -280,9 +352,15 @@ test('页面、CSS 与 Canvas 客户端均明确引用正式版本美术资源',
     assert.ok(source.includes(stage), `Canvas 地图注册表必须包含 ${stage}`);
   }
   assert.match(source, /visibleTileRange\s*\(/i, 'Canvas 必须按镜头加载地图块');
-  assert.match(source, /terrain-common-v1\.webp/i, 'Canvas 必须加载可见碰撞地形图集');
+  assert.match(source, /ground-r\$?\{?row|ground-r0-c0-v6/i, 'Canvas 必须加载 v6 地面块');
+  assert.match(source, /surface-v6\.webp/i, 'Canvas 必须注册 v6 地表图集');
+  assert.match(source, /foreground-v6\.webp/i, 'Canvas 必须注册 v6 透明前景图集');
+  assert.match(source, /ambient-mask-/i, 'Canvas 必须注册 v6 动态环境遮罩');
   assert.doesNotMatch(source, /world-map-v4\.webp/i, '生产客户端不应继续加载旧单张地图');
   assert.doesNotMatch(frontend, /assets\/arena-v2\.webp/i, '三关地图版本不应继续加载旧单屏竞技场');
+  assert.doesNotMatch(source, /map-r[0-3]-c[0-3]-(?:v5|v1)\.webp/i, '生产客户端不得回退旧世界地图块');
+  assert.doesNotMatch(source, /overview-(?:v5|v1)\.webp/i, '生产客户端不得引用旧航路概览');
+  assert.doesNotMatch(source, /terrain-(?:common|stage-0[23])-v1\.webp/i, '生产客户端不得引用旧碰撞贴图');
 
   assert.doesNotMatch(
     frontend,

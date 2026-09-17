@@ -1,0 +1,92 @@
+{
+  "version": 6,
+  "cellSize": 384,
+  "columns": 4,
+  "rows": 2,
+  "assets": {
+    "landing-arch": {
+      "column": 0,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.9
+      ],
+      "content": [
+        24,
+        42,
+        336,
+        322
+      ]
+    },
+    "canal-bridge": {
+      "column": 1,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.86
+      ],
+      "content": [
+        24,
+        99,
+        336,
+        265
+      ]
+    },
+    "sluice-machine": {
+      "column": 2,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.88
+      ],
+      "content": [
+        30,
+        20,
+        324,
+        344
+      ]
+    },
+    "cargo-shrine": {
+      "column": 3,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.9
+      ],
+      "content": [
+        56,
+        20,
+        271,
+        344
+      ]
+    },
+    "opera-stage": {
+      "column": 0,
+      "row": 1,
+      "anchor": [
+        0.5,
+        0.92
+      ],
+      "content": [
+        24,
+        45,
+        336,
+        319
+      ]
+    },
+    "regent-gate": {
+      "column": 1,
+      "row": 1,
+      "anchor": [
+        0.5,
+        0.94
+      ],
+      "content": [
+        24,
+        48,
+        336,
+        316
+      ]
+    }
+  }
+}

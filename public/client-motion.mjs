@@ -1,7 +1,15 @@
 const PLAYER_SPEED = Object.freeze({
   vanguard: 245,
-  ranger: 275,
+  ranger: 260,
 });
+const ROLE_ACTION_MOVE_MULTIPLIER = 0.65;
+const DODGE_SPEED = 610;
+const RANGER_SHOT_INTERVAL_MS = 400;
+const RANGER_SHOT_SLOW_MS = 200;
+const INPUT_SIGNATURE_REFRESH_MS = 450;
+const MIN_LOCAL_PREDICTION_HORIZON_MS = 900;
+const MAX_LOCAL_PREDICTION_HORIZON_MS = 2_000;
+const WALKABLE_FALLBACK_SAMPLES = 32;
 
 function finite(value, fallback = 0) {
   const number = Number(value);
@@ -10,6 +18,100 @@ function finite(value, fallback = 0) {
 
 function clamp(value, minimum, maximum) {
   return Math.max(minimum, Math.min(maximum, value));
+}
+
+function inputSequence(value) {
+  const sequence = Number(value);
+  return Number.isSafeInteger(sequence) && sequence >= 0 ? sequence : null;
+}
+
+export function queuePendingInput(buffer, input, sentAt, limit = 64) {
+  if (!Array.isArray(buffer)) throw new TypeError('pending input buffer must be an array');
+  const seq = inputSequence(input?.seq);
+  if (seq === null) return null;
+  const existing = buffer.find((entry) => entry.seq === seq);
+  if (existing) return existing;
+  const entry = {
+    ...input,
+    seq,
+    move: { x: finite(input?.move?.x), y: finite(input?.move?.y) },
+    aim: { x: finite(input?.aim?.x), y: finite(input?.aim?.y) },
+    sentAt: finite(sentAt),
+    acknowledged: false,
+  };
+  buffer.push(entry);
+  while (buffer.length > Math.max(1, Math.floor(finite(limit, 64)))) buffer.shift();
+  return entry;
+}
+
+export function acknowledgePendingInput(buffer, acknowledgement) {
+  if (!Array.isArray(buffer)) throw new TypeError('pending input buffer must be an array');
+  const seq = inputSequence(acknowledgement?.seq);
+  if (seq === null) return false;
+  const index = buffer.findIndex((entry) => entry.seq === seq);
+  if (index < 0) return false;
+  if (acknowledgement?.accepted === false) {
+    buffer.splice(index, 1);
+    return false;
+  }
+  buffer[index].acknowledged = true;
+  return true;
+}
+
+export function pruneProcessedInputs(buffer, lastProcessedInputSeq) {
+  if (!Array.isArray(buffer)) throw new TypeError('pending input buffer must be an array');
+  const processed = inputSequence(lastProcessedInputSeq);
+  if (processed === null) return 0;
+  const previousLength = buffer.length;
+  const retained = buffer.filter((entry) => entry.seq > processed);
+  buffer.splice(0, buffer.length, ...retained);
+  return previousLength - buffer.length;
+}
+
+export function pendingOneShotRetry(buffer, lastProcessedInputSeq = -1) {
+  if (!Array.isArray(buffer)) throw new TypeError('pending input buffer must be an array');
+  const processed = inputSequence(lastProcessedInputSeq) ?? -1;
+  return buffer.find((entry) => entry.seq > processed
+    && entry.acknowledged !== true
+    && (entry.dodge === true || entry.skill === true)) ?? null;
+}
+
+export function shouldSendInput(signature, lastSignature, elapsedMs, force = false) {
+  return force === true
+    || signature !== lastSignature
+    || Math.max(0, finite(elapsedMs)) >= INPUT_SIGNATURE_REFRESH_MS;
+}
+
+export function localPredictionHorizonMs(rttMs = 0) {
+  return clamp(
+    Math.max(MIN_LOCAL_PREDICTION_HORIZON_MS, finite(rttMs) * 2 + 250),
+    MIN_LOCAL_PREDICTION_HORIZON_MS,
+    MAX_LOCAL_PREDICTION_HORIZON_MS,
+  );
+}
+
+export function authorityLeadTolerance(speed, rttMs = 0) {
+  const measuredRtt = Math.max(0, finite(rttMs));
+  const effectiveRtt = measuredRtt > 0 ? measuredRtt : 250;
+  const authorityAgeMs = clamp(effectiveRtt + 50, 120, 2_000);
+  return Math.max(0, finite(speed)) * authorityAgeMs / 1000;
+}
+
+export function advanceRangerShotPrediction(state = {}, options = {}) {
+  const now = Math.max(0, finite(options.now));
+  let readyAt = Math.max(0, finite(state.readyAt));
+  let slowUntil = Math.max(0, finite(state.slowUntil));
+  if (options.attacking === true && now >= readyAt) {
+    // The 30 Hz authority quantizes its 0.38 s cooldown and 0.22 s movement
+    // penalty to a 0.4 s firing interval with 0.2 s of slowed movement.
+    readyAt = now + RANGER_SHOT_INTERVAL_MS;
+    slowUntil = Math.max(slowUntil, now + RANGER_SHOT_SLOW_MS);
+  }
+  return {
+    readyAt,
+    slowUntil,
+    shotSlowRemaining: Math.max(0, (slowUntil - now) / 1000),
+  };
 }
 
 function snapshotOrder(state) {
@@ -125,6 +227,124 @@ function roleSpeed(role) {
     : PLAYER_SPEED.vanguard;
 }
 
+function predictionSpeed(role, shotSlowRemaining, guarding) {
+  const ranger = /ranger|gunner|gun|rune|range/i.test(String(role || ''));
+  const slowedByAction = ranger ? finite(shotSlowRemaining) > 0 : guarding;
+  return roleSpeed(role) * (slowedByAction ? ROLE_ACTION_MOVE_MULTIPLIER : 1);
+}
+
+function pointInPolygon(point, polygon) {
+  if (!Array.isArray(polygon) || polygon.length < 3) return false;
+  for (let index = 0, previous = polygon.length - 1; index < polygon.length; previous = index, index += 1) {
+    const currentPoint = polygon[index];
+    const previousPoint = polygon[previous];
+    const currentX = finite(currentPoint?.[0] ?? currentPoint?.x);
+    const currentY = finite(currentPoint?.[1] ?? currentPoint?.y);
+    const previousX = finite(previousPoint?.[0] ?? previousPoint?.x);
+    const previousY = finite(previousPoint?.[1] ?? previousPoint?.y);
+    const edgeX = currentX - previousX;
+    const edgeY = currentY - previousY;
+    const pointX = finite(point?.x) - previousX;
+    const pointY = finite(point?.y) - previousY;
+    const cross = Math.abs(pointX * edgeY - pointY * edgeX);
+    const edgeLength = Math.hypot(edgeX, edgeY);
+    const dot = pointX * edgeX + pointY * edgeY;
+    if (cross <= Math.max(0.0001, edgeLength * 0.000001)
+      && dot >= -0.0001
+      && dot <= edgeX * edgeX + edgeY * edgeY + 0.0001) return true;
+  }
+  let inside = false;
+  for (let index = 0, previous = polygon.length - 1; index < polygon.length; previous = index, index += 1) {
+    const currentPoint = polygon[index];
+    const previousPoint = polygon[previous];
+    const currentX = finite(currentPoint?.[0] ?? currentPoint?.x);
+    const currentY = finite(currentPoint?.[1] ?? currentPoint?.y);
+    const previousX = finite(previousPoint?.[0] ?? previousPoint?.x);
+    const previousY = finite(previousPoint?.[1] ?? previousPoint?.y);
+    const crosses = (currentY > finite(point?.y)) !== (previousY > finite(point?.y))
+      && finite(point?.x) < ((previousX - currentX) * (finite(point?.y) - currentY)) / (previousY - currentY) + currentX;
+    if (crosses) inside = !inside;
+  }
+  return inside;
+}
+
+function walkablePoints(entry) {
+  if (Array.isArray(entry?.points)) return entry.points;
+  return Array.isArray(entry) ? entry : [];
+}
+
+function pointInWalkableArea(point, walkablePolygons) {
+  const polygons = Array.isArray(walkablePolygons) ? walkablePolygons : [];
+  if (polygons.length === 0) return true;
+  return polygons.some((entry) => pointInPolygon(point, walkablePoints(entry)));
+}
+
+function pointToSegmentDistanceSquared(point, segment) {
+  const edgeX = finite(segment?.bx) - finite(segment?.ax);
+  const edgeY = finite(segment?.by) - finite(segment?.ay);
+  const lengthSquared = edgeX * edgeX + edgeY * edgeY;
+  const progress = lengthSquared > 0
+    ? clamp(
+      ((finite(point?.x) - finite(segment?.ax)) * edgeX
+        + (finite(point?.y) - finite(segment?.ay)) * edgeY) / lengthSquared,
+      0,
+      1,
+    )
+    : 0;
+  const nearestX = finite(segment?.ax) + edgeX * progress;
+  const nearestY = finite(segment?.ay) + edgeY * progress;
+  const dx = finite(point?.x) - nearestX;
+  const dy = finite(point?.y) - nearestY;
+  return dx * dx + dy * dy;
+}
+
+function circleInsideWalkableArea(circle, walkablePolygons, boundarySegments = []) {
+  const polygons = Array.isArray(walkablePolygons) ? walkablePolygons : [];
+  if (polygons.length === 0) return true;
+  const radius = Math.max(0, finite(circle?.radius));
+  if (!pointInWalkableArea(circle, polygons)) return false;
+  if (Array.isArray(boundarySegments) && boundarySegments.length > 0) {
+    const minimumDistance = Math.max(0, radius - 0.0001);
+    const minimumSquared = minimumDistance * minimumDistance;
+    return boundarySegments.every((segment) =>
+      pointToSegmentDistanceSquared(circle, segment) >= minimumSquared,
+    );
+  }
+  for (let index = 0; index < WALKABLE_FALLBACK_SAMPLES; index += 1) {
+    const angle = (Math.PI * 2 * index) / WALKABLE_FALLBACK_SAMPLES;
+    if (!pointInWalkableArea({
+      x: finite(circle?.x) + Math.cos(angle) * radius,
+      y: finite(circle?.y) + Math.sin(angle) * radius,
+    }, polygons)) return false;
+  }
+  return true;
+}
+
+function movementInfluence(position, zones, baseSpeed) {
+  let multiplier = 1;
+  let pushX = 0;
+  let pushY = 0;
+  for (const zone of Array.isArray(zones) ? zones : []) {
+    const polygons = Array.isArray(zone?.polygons) ? zone.polygons : [];
+    if (!polygons.some((polygon) => pointInPolygon(position, polygon))) continue;
+    multiplier = Math.min(multiplier, clamp(finite(zone.multiplier, 1), 0.1, 1));
+    if (zone.kind !== 'wind' || !zone.vector) continue;
+    const vectorX = finite(zone.vector.x);
+    const vectorY = finite(zone.vector.y);
+    const vectorLength = Math.hypot(vectorX, vectorY);
+    const vectorScale = vectorLength > 1 ? 1 / vectorLength : 1;
+    pushX += vectorX * vectorScale * baseSpeed * 0.18;
+    pushY += vectorY * vectorScale * baseSpeed * 0.18;
+  }
+  const maximumPush = Math.max(0, baseSpeed) * 0.18;
+  const pushLength = Math.hypot(pushX, pushY);
+  if (pushLength > maximumPush && pushLength > 0) {
+    pushX *= maximumPush / pushLength;
+    pushY *= maximumPush / pushLength;
+  }
+  return { multiplier, push: { x: pushX, y: pushY } };
+}
+
 function pushCircleOutOfObstacle(circle, obstacle) {
   const radius = Math.max(0, finite(circle?.radius));
   const obstacleX = finite(obstacle?.x);
@@ -184,42 +404,117 @@ export function resolveObstacleCollisions(position, options = {}) {
   const padding = Math.max(0, finite(options.arena?.padding));
   const arenaWidth = Math.max((padding + radius) * 2, finite(options.arena?.width, 1600));
   const arenaHeight = Math.max((padding + radius) * 2, finite(options.arena?.height, 900));
-  const resolved = {
-    x: clamp(finite(position?.x), padding + radius, arenaWidth - padding - radius),
-    y: clamp(finite(position?.y), padding + radius, arenaHeight - padding - radius),
-    radius,
-  };
   const obstacles = Array.isArray(options.obstacles) ? options.obstacles : [];
-
-  for (let pass = 0; pass < 4; pass += 1) {
-    let collided = false;
-    for (const obstacle of obstacles) {
-      if (!obstacle || typeof obstacle !== 'object') continue;
-      if (pushCircleOutOfObstacle(resolved, obstacle)) collided = true;
+  const walkablePolygons = Array.isArray(options.walkablePolygons) ? options.walkablePolygons : [];
+  const walkableBoundarySegments = Array.isArray(options.walkableBoundarySegments)
+    ? options.walkableBoundarySegments
+    : [];
+  const resolveCandidate = (candidate) => {
+    const resolved = {
+      x: clamp(finite(candidate?.x), padding + radius, arenaWidth - padding - radius),
+      y: clamp(finite(candidate?.y), padding + radius, arenaHeight - padding - radius),
+      radius,
+    };
+    for (let pass = 0; pass < 4; pass += 1) {
+      let collided = false;
+      for (const obstacle of obstacles) {
+        if (!obstacle || typeof obstacle !== 'object') continue;
+        if (pushCircleOutOfObstacle(resolved, obstacle)) collided = true;
+      }
+      resolved.x = clamp(resolved.x, padding + radius, arenaWidth - padding - radius);
+      resolved.y = clamp(resolved.y, padding + radius, arenaHeight - padding - radius);
+      if (!collided) break;
     }
-    resolved.x = clamp(resolved.x, padding + radius, arenaWidth - padding - radius);
-    resolved.y = clamp(resolved.y, padding + radius, arenaHeight - padding - radius);
-    if (!collided) break;
+    return resolved;
+  };
+  const candidate = resolveCandidate(position);
+  if (circleInsideWalkableArea(candidate, walkablePolygons, walkableBoundarySegments)) {
+    return { x: candidate.x, y: candidate.y };
   }
 
-  return { x: resolved.x, y: resolved.y };
+  const previous = options.previousPosition ? resolveCandidate(options.previousPosition) : null;
+  if (!previous || !circleInsideWalkableArea(previous, walkablePolygons, walkableBoundarySegments)) {
+    return { x: candidate.x, y: candidate.y };
+  }
+  const alternatives = [];
+  if (Math.abs(candidate.x - previous.x) > 0.0001) {
+    alternatives.push(resolveCandidate({ x: candidate.x, y: previous.y }));
+  }
+  if (Math.abs(candidate.y - previous.y) > 0.0001) {
+    alternatives.push(resolveCandidate({ x: previous.x, y: candidate.y }));
+  }
+  const slide = alternatives
+    .filter((resolved) => circleInsideWalkableArea(resolved, walkablePolygons, walkableBoundarySegments))
+    .sort((left, right) => (
+      Math.hypot(right.x - previous.x, right.y - previous.y)
+      - Math.hypot(left.x - previous.x, left.y - previous.y)
+    ))[0];
+  if (slide) return { x: slide.x, y: slide.y };
+
+  let minimum = 0;
+  let maximum = 1;
+  let nearest = previous;
+  for (let iteration = 0; iteration < 12; iteration += 1) {
+    const progress = (minimum + maximum) / 2;
+    const probe = resolveCandidate({
+      x: previous.x + (candidate.x - previous.x) * progress,
+      y: previous.y + (candidate.y - previous.y) * progress,
+    });
+    if (circleInsideWalkableArea(probe, walkablePolygons, walkableBoundarySegments)) {
+      nearest = probe;
+      minimum = progress;
+    } else {
+      maximum = progress;
+    }
+  }
+  return { x: nearest.x, y: nearest.y };
 }
 
 export function predictLocalPosition(position, options = {}) {
   const radius = Math.max(0, finite(options.radius, 24));
-  const moveX = finite(options.move?.x);
-  const moveY = finite(options.move?.y);
+  const dodging = finite(options.dodgeRemaining) > 0;
+  const movement = dodging ? (options.dodgeVector ?? options.move) : options.move;
+  const moveX = finite(movement?.x);
+  const moveY = finite(movement?.y);
   const magnitude = Math.hypot(moveX, moveY);
   const scale = magnitude > 1 ? 1 / magnitude : 1;
   const dt = clamp(finite(options.dt), 0, 0.05);
-  const speed = roleSpeed(options.role);
+  const baseSpeed = roleSpeed(options.role);
+  const speed = dodging
+    ? DODGE_SPEED
+    : predictionSpeed(
+      options.role,
+      options.shotSlowRemaining,
+      options.guarding === true || finite(options.guardRemaining) > 0,
+    );
+  const environment = movementInfluence(position, options.movementZones, baseSpeed);
   return resolveObstacleCollisions({
-    x: finite(position?.x) + moveX * scale * speed * dt,
-    y: finite(position?.y) + moveY * scale * speed * dt,
-  }, options);
+    x: finite(position?.x) + (moveX * scale * speed * environment.multiplier + environment.push.x) * dt,
+    y: finite(position?.y) + (moveY * scale * speed * environment.multiplier + environment.push.y) * dt,
+  }, { ...options, previousPosition: position });
 }
 
-export function reconcileLocalPosition(predicted, authoritative, move = {}, hardSnapDistance = 160) {
+export function shouldSuppressBackwardCorrection({
+  moving = false,
+  hasProcessedInputSeq = false,
+  pendingInputs = [],
+  confirmedMove = null,
+} = {}) {
+  if (!moving) return false;
+  if (!hasProcessedInputSeq) return true;
+  if (!Array.isArray(pendingInputs) || pendingInputs.length === 0) return false;
+  if (!confirmedMove) return true;
+  const confirmedX = finite(confirmedMove.x);
+  const confirmedY = finite(confirmedMove.y);
+  return pendingInputs.some((input) => input?.dodge === true
+    || input?.skill === true
+    || Math.hypot(
+      finite(input?.move?.x) - confirmedX,
+      finite(input?.move?.y) - confirmedY,
+    ) >= 0.05);
+}
+
+export function reconcileLocalPosition(predicted, authoritative, move = {}, hardSnapDistance = 160, options = {}) {
   if (!authoritative) return predicted ?? null;
   if (!predicted) return { x: finite(authoritative.x), y: finite(authoritative.y) };
   const errorX = finite(authoritative.x) - finite(predicted.x);
@@ -247,10 +542,31 @@ export function reconcileLocalPosition(predicted, authoritative, move = {}, hard
   const lateralY = errorY - forwardError * directionY;
   // Authority may legitimately be behind after a dropped input or a server
   // collision. Correct both directions, but slowly enough to avoid a snap.
-  const catchUp = clamp(forwardError, -hardDistance * 0.35, hardDistance);
+  const backwardLimit = options.suppressBackwardCorrection ? 0 : hardDistance * 0.35;
+  const backwardTolerance = Math.max(0, finite(options.backwardTolerance));
+  const correctableForwardError = forwardError < 0
+    ? Math.min(0, forwardError + backwardTolerance)
+    : forwardError;
+  const catchUp = clamp(correctableForwardError, -backwardLimit, hardDistance);
+  const configuredBackwardCorrectionLimit = Number(options.maxBackwardCorrection);
+  const maximumBackwardCorrection = Number.isFinite(configuredBackwardCorrectionLimit)
+    ? Math.max(0, configuredBackwardCorrectionLimit)
+    : Infinity;
+  const forwardCorrection = Math.max(catchUp * 0.22, -maximumBackwardCorrection);
+  let correctionX = lateralX * 0.22 + directionX * forwardCorrection;
+  let correctionY = lateralY * 0.22 + directionY * forwardCorrection;
+  const configuredCorrectionLimit = Number(options.maxCorrection);
+  const maximumCorrection = Number.isFinite(configuredCorrectionLimit)
+    ? Math.max(0, configuredCorrectionLimit)
+    : Infinity;
+  const correctionLength = Math.hypot(correctionX, correctionY);
+  if (correctionLength > maximumCorrection) {
+    correctionX *= maximumCorrection / correctionLength;
+    correctionY *= maximumCorrection / correctionLength;
+  }
   return {
-    x: finite(predicted.x) + (lateralX + directionX * catchUp) * 0.22,
-    y: finite(predicted.y) + (lateralY + directionY * catchUp) * 0.22,
+    x: finite(predicted.x) + correctionX,
+    y: finite(predicted.y) + correctionY,
   };
 }
 
@@ -396,7 +712,7 @@ export function resolveAnimationState(entity = {}, moving = false) {
   if (/down|dead|defeat|death|倒|死亡/.test(`${status} ${action}`) || finite(entity.hp, 1) <= 0) return 'down';
   if (entity.hit || entity.hurt || /hurt|hit|stagger|受伤|受击/.test(action)) return 'hurt';
   if (/attack|shoot|slash|cast|strike|攻击|射击|挥砍/.test(action)) return 'attack';
-  if (/special|charge|roar|summon|技能|蓄力/.test(action)) return 'special';
+  if (/special|skill|charge|guard|mark|roar|summon|技能|蓄力/.test(action)) return 'special';
   if (moving || /run|walk|move|chase|移动|追击/.test(action) || Math.hypot(finite(entity.vx), finite(entity.vy)) > 4) return 'run';
   return 'idle';
 }

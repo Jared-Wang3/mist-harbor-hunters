@@ -19,6 +19,28 @@ async function post(path, body) {
   return { response, json };
 }
 
+async function disconnectLastSse(session) {
+  const controller = new AbortController();
+  const query = new URLSearchParams({ playerId: session.playerId, token: session.token });
+  const response = await fetch(`${baseUrl}/api/rooms/${session.roomCode}/events?${query}`, {
+    signal: controller.signal,
+  });
+  assert.equal(response.status, 200);
+  const reader = response.body.getReader();
+  await reader.read();
+  controller.abort();
+  await reader.cancel().catch(() => {});
+
+  const record = app.rooms.get(session.roomCode);
+  const storedSession = record.sessions.get(session.playerId);
+  for (let attempt = 0; attempt < 50 && storedSession.connected; attempt += 1) {
+    await new Promise((resolveWait) => setTimeout(resolveWait, 2));
+  }
+  assert.equal(storedSession.connected, false, '最后一个 SSE 断开后应进入离线状态');
+  assert.equal(record.game.players.get(session.playerId).connected, false);
+  return { record, storedSession };
+}
+
 before(async () => {
   temporaryPublic = await mkdtemp(join(tmpdir(), 'mist-harbor-test-'));
   await writeFile(join(temporaryPublic, 'index.html'), '<!doctype html><title>雾港猎团</title>', 'utf8');
@@ -63,6 +85,9 @@ test('创建、加入、满房、输入防重放与令牌重连形成完整合�
   assert.equal(joined.json.state.stage.mapKey, 'stage-01');
   assert.equal(joined.json.state.arena.width, 5120);
   assert.equal(joined.json.state.collectibles.filter((item) => item.kind === 'seal').length, 3);
+  assert.ok(joined.json.state.surfaceZones.length > 0);
+  assert.ok(Array.isArray(joined.json.state.movementZones));
+  assert.ok(joined.json.state.ambientEmitters.length > 0);
   assert.equal(joined.json.state.players.length, 2);
 
   const full = await post(`/api/rooms/${created.json.roomCode}/join`, { name: '第三人' });
@@ -78,6 +103,7 @@ test('创建、加入、满房、输入防重放与令牌重连形成完整合�
     attack: true,
     interact: false,
     dodge: false,
+    skill: true,
   };
   const accepted = await post(`/api/rooms/${created.json.roomCode}/input`, inputBody);
   assert.equal(accepted.response.status, 202);
@@ -85,6 +111,13 @@ test('创建、加入、满房、输入防重放与令牌重连形成完整合�
   const replayed = await post(`/api/rooms/${created.json.roomCode}/input`, inputBody);
   assert.equal(replayed.response.status, 200);
   assert.equal(replayed.json.accepted, false);
+  const invalidSkill = await post(`/api/rooms/${created.json.roomCode}/input`, {
+    ...inputBody,
+    seq: 2,
+    skill: 'yes',
+  });
+  assert.equal(invalidSkill.response.status, 400);
+  assert.equal(invalidSkill.json.error.code, 'invalid_input');
 
   const invalidToken = await fetch(
     `${baseUrl}/api/rooms/${created.json.roomCode}/state?playerId=${created.json.playerId}&token=wrong`,
@@ -171,6 +204,99 @@ test('单人试炼自动加入 AI，SSE 立即推送可渲染状态', async () =
   assert.match(chunk, /"arena"/);
   controller.abort();
   await reader.cancel().catch(() => {});
+});
+
+test('Node SSE 断开后纯 HTTP fallback 的 /state 会恢复在线状态', async () => {
+  const created = await post('/api/rooms', { mode: 'solo', name: '轮询守灯人' });
+  const { record, storedSession } = await disconnectLastSse(created.json);
+  const disconnectedAt = record.lastActive;
+  await new Promise((resolveWait) => setTimeout(resolveWait, 20));
+
+  const query = new URLSearchParams({
+    playerId: created.json.playerId,
+    token: created.json.token,
+  });
+  const response = await fetch(`${baseUrl}/api/rooms/${created.json.roomCode}/state?${query}`);
+  const state = await response.json();
+  const player = state.players.find((candidate) => candidate.id === created.json.playerId);
+
+  assert.equal(response.status, 200);
+  assert.equal(storedSession.connected, true);
+  assert.equal(player.connected, true);
+  assert.ok(record.lastActive > disconnectedAt, '合法状态轮询应刷新房间活动时间');
+});
+
+test('Node SSE 断开后纯 HTTP fallback 的 /input 会恢复在线并仍可过关', async () => {
+  const created = await post('/api/rooms', { mode: 'solo', name: '断流猎人' });
+  const { record, storedSession } = await disconnectLastSse(created.json);
+  const player = record.game.players.get(created.json.playerId);
+  player.x = record.game.phase.exit.x;
+  player.y = record.game.phase.exit.y;
+  player.invulnerable = 99;
+  record.game.run.sealsCollected = record.game.run.sealsRequired;
+  record.game.run.bossActivated = true;
+  record.game.run.bossDefeated = true;
+  record.game.run.exitUnlocked = true;
+
+  const input = await post(`/api/rooms/${created.json.roomCode}/input`, {
+    playerId: created.json.playerId,
+    token: created.json.token,
+    seq: 1,
+    move: { x: 0, y: 0 },
+    aim: { x: 1, y: 0 },
+    attack: false,
+    interact: true,
+    dodge: false,
+    skill: false,
+  });
+
+  assert.equal(input.response.status, 202);
+  assert.equal(input.json.accepted, true);
+  assert.equal(storedSession.connected, true);
+  assert.equal(player.connected, true);
+  assert.equal(player.input.interact, true, '恢复连接不能覆盖本次合法输入');
+  for (let tick = 0; tick < 20; tick += 1) record.game.update(0.05);
+  assert.equal(record.game.snapshot().stage.status, 'stage_complete');
+});
+
+test('Node 循环固定步长追赶 100ms/250ms 延迟且限制单轮追赶量', async () => {
+  let now = 1_000;
+  const deltas = [];
+  const timing = createGameServer({
+    publicDir: temporaryPublic,
+    clock: () => now,
+  });
+  timing.rooms.set('TIMING', {
+    code: 'TIMING',
+    game: { update: (delta) => deltas.push(delta) },
+    clients: new Set(),
+    sessions: new Map(),
+  });
+
+  const runDelayedFrame = (elapsedMs) => {
+    deltas.length = 0;
+    now += elapsedMs;
+    return timing.simulationStep?.();
+  };
+
+  try {
+    const hundredMs = runDelayedFrame(100);
+    assert.equal(deltas.length, 3, '100ms 延迟应追赶三个 30Hz 固定步长');
+    assert.ok(deltas.every((delta) => Math.abs(delta - 1 / 30) < 1e-9));
+    assert.ok(Math.abs(hundredMs.simulatedSeconds + hundredMs.pendingSeconds - 0.1) < 1e-9);
+
+    const quarterSecond = runDelayedFrame(250);
+    assert.equal(deltas.length, 7, '250ms 延迟应执行七步并保留不足一步的余量');
+    assert.ok(Math.abs(quarterSecond.simulatedSeconds + quarterSecond.pendingSeconds - 0.25) < 1e-9);
+
+    const capped = runDelayedFrame(2_000);
+    assert.equal(deltas.length, 8, '长时间停顿单轮最多追赶八步');
+    assert.ok(deltas.every((delta) => Math.abs(delta - 1 / 30) < 1e-9), '追赶不得传入巨型 dt');
+    assert.ok(capped.simulatedSeconds <= 8 / 30 + 1e-9);
+    assert.ok(capped.droppedSeconds > 1.7, '超过安全窗口的陈旧时间必须丢弃');
+  } finally {
+    await timing.close();
+  }
 });
 
 test('过期房间会关闭并拒绝后续访问', async () => {

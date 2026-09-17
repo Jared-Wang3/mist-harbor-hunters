@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 6,
+  "id": "stage-02",
+  "title": "赤灯潮市",
+  "world": { "width": 5120, "height": 2880 },
+  "spawn": { "x": 420, "y": 480 },
+  "exit": { "x": 4740, "y": 360, "radius": 118, "holdSeconds": 1 },
+  "boss": { "x": 4300, "y": 610, "zoneId": "regent_gate" },
+  "zones": [
+    { "id": "red_camp", "name": "赤灯前哨", "kind": "safe", "x": 80, "y": 100, "width": 940, "height": 900, "center": { "x": 420, "y": 480 }, "hasSeal": false },
+    { "id": "ember_wharf", "name": "余烬长埠", "kind": "hunt", "x": 420, "y": 1460, "width": 1740, "height": 1320, "center": { "x": 1320, "y": 2180 }, "hasSeal": true },
+    { "id": "tide_bazaar", "name": "潮汐商廊", "kind": "hunt", "x": 1740, "y": 700, "width": 1660, "height": 1480, "center": { "x": 2550, "y": 1430 }, "hasSeal": true },
+    { "id": "lantern_court", "name": "万灯庭院", "kind": "hunt", "x": 3260, "y": 1320, "width": 1780, "height": 1460, "center": { "x": 4140, "y": 2070 }, "hasSeal": true },
+    { "id": "regent_gate", "name": "摄政门", "kind": "boss", "x": 3560, "y": 100, "width": 1480, "height": 1120, "center": { "x": 4300, "y": 610 }, "hasSeal": false }
+  ],
+  "objectives": [
+    { "id": "seal-ember_wharf", "kind": "seal", "zoneId": "ember_wharf", "x": 1730, "y": 2390, "radius": 54 },
+    { "id": "seal-tide_bazaar", "kind": "seal", "zoneId": "tide_bazaar", "x": 2850, "y": 1450, "radius": 54 },
+    { "id": "seal-lantern_court", "kind": "seal", "zoneId": "lantern_court", "x": 4430, "y": 2240, "radius": 54 }
+  ],
+  "encounterAnchors": [
+    { "zoneId": "ember_wharf", "x": 720, "y": 1880 },
+    { "zoneId": "ember_wharf", "x": 1080, "y": 2320 },
+    { "zoneId": "ember_wharf", "x": 1600, "y": 1830 },
+    { "zoneId": "ember_wharf", "x": 1960, "y": 2480 },
+    { "zoneId": "tide_bazaar", "x": 1900, "y": 1160 },
+    { "zoneId": "tide_bazaar", "x": 2300, "y": 1780 },
+    { "zoneId": "tide_bazaar", "x": 2750, "y": 980 },
+    { "zoneId": "tide_bazaar", "x": 3410, "y": 1840 },
+    { "zoneId": "lantern_court", "x": 3480, "y": 1580 },
+    { "zoneId": "lantern_court", "x": 3820, "y": 2390 },
+    { "zoneId": "lantern_court", "x": 4310, "y": 1790 },
+    { "zoneId": "lantern_court", "x": 4820, "y": 2460 }
+  ],
+  "walkablePolygons": [
+    { "id": "west-market-bank", "surface": "market-stone", "points": [[80, 80], [1200, 80], [1200, 1380], [2260, 1380], [2260, 2800], [80, 2800]] },
+    { "id": "central-bazaar-bank", "surface": "wet-brick", "points": [[1500, 80], [3040, 80], [3040, 1740], [3440, 1740], [3440, 2800], [2260, 2800], [2260, 1380], [1500, 1380]] },
+    { "id": "east-lantern-bank", "surface": "market-stone", "points": [[3360, 80], [5040, 80], [5040, 2800], [3440, 2800], [3440, 1740], [3360, 1740]] },
+    { "id": "south-wharf-bridge", "surface": "timber-wharf", "points": [[1120, 1300], [1560, 1300], [1560, 1800], [1120, 1800]] },
+    { "id": "court-bridge", "surface": "timber-wharf", "points": [[2970, 1660], [3430, 1660], [3430, 2040], [2970, 2040]] }
+  ],
+  "surfaceZones": [
+    { "id": "canal-base", "surface": "canal-water", "priority": 0, "polygons": [[[0, 0], [5120, 0], [5120, 2880], [0, 2880]]] },
+    { "id": "market-banks", "surface": "market-stone", "priority": 10, "polygons": [[[80, 80], [1200, 80], [1200, 1380], [2260, 1380], [2260, 2800], [80, 2800]], [[3360, 80], [5040, 80], [5040, 2800], [3440, 2800], [3440, 1740], [3360, 1740]]] },
+    { "id": "bazaar-brick", "surface": "wet-brick", "priority": 15, "polygons": [[[1500, 80], [3040, 80], [3040, 1740], [3440, 1740], [3440, 2800], [2260, 2800], [2260, 1380], [1500, 1380]]] },
+    { "id": "wharf-decks", "surface": "timber-wharf", "priority": 25, "polygons": [[[1120, 1300], [1560, 1300], [1560, 1800], [1120, 1800]], [[2970, 1660], [3430, 1660], [3430, 2040], [2970, 2040]], [[380, 2440], [2090, 2440], [2090, 2770], [380, 2770]]] }
+  ],
+  "movementZones": [
+    { "id": "wet-bazaar", "kind": "slow", "multiplier": 0.92, "polygons": [[[1500, 80], [3040, 80], [3040, 1740], [3440, 1740], [3440, 2800], [2260, 2800], [2260, 1380], [1500, 1380]]] }
+  ],
+  "blockedRegions": [
+    { "id": "west-canal-north", "kind": "canal_water", "shape": "rect", "x": 1200, "y": 0, "width": 300, "height": 1300 },
+    { "id": "west-canal-south", "kind": "canal_water", "shape": "rect", "x": 1200, "y": 1800, "width": 300, "height": 1080 },
+    { "id": "east-canal-north", "kind": "canal_water", "shape": "rect", "x": 3040, "y": 0, "width": 320, "height": 1640 },
+    { "id": "east-canal-south", "kind": "canal_water", "shape": "rect", "x": 3040, "y": 2040, "width": 320, "height": 840 },
+    { "id": "south-basin", "kind": "canal_water", "shape": "rect", "x": 1500, "y": 2800, "width": 1540, "height": 80 },
+    { "id": "court-pool", "kind": "canal_water", "shape": "circle", "x": 4080, "y": 1460, "radius": 230 }
+  ],
+  "props": [
+    { "id": "landing-arch", "asset": "landing-arch", "x": 620, "y": 870, "scale": 1, "anchor": [0.5, 0.9], "collision": { "shape": "rect", "x": 470, "y": 780, "width": 300, "height": 135 } },
+    { "id": "west-canal-bridge", "asset": "canal-bridge", "x": 1350, "y": 1580, "scale": 1.08, "anchor": [0.5, 0.86], "collision": { "shape": "rect", "x": 1230, "y": 1500, "width": 240, "height": 100 } },
+    { "id": "ember-cargo-shrine", "asset": "cargo-shrine", "x": 860, "y": 2020, "scale": 0.92, "anchor": [0.5, 0.9], "collision": { "shape": "rect", "x": 720, "y": 1930, "width": 280, "height": 145 } },
+    { "id": "ember-sluice", "asset": "sluice-machine", "x": 1900, "y": 2670, "scale": 1, "anchor": [0.5, 0.88], "collision": { "shape": "rect", "x": 1740, "y": 2580, "width": 320, "height": 145 } },
+    { "id": "bazaar-cargo-shrine", "asset": "cargo-shrine", "x": 2300, "y": 1140, "scale": 0.8, "anchor": [0.5, 0.9], "collision": { "shape": "rect", "x": 2180, "y": 1060, "width": 240, "height": 125 } },
+    { "id": "opera-stage", "asset": "opera-stage", "x": 2670, "y": 1880, "scale": 1.05, "anchor": [0.5, 0.92], "collision": { "shape": "rect", "x": 2460, "y": 1770, "width": 420, "height": 175 } },
+    { "id": "east-canal-bridge", "asset": "canal-bridge", "x": 3200, "y": 1840, "scale": 1.12, "anchor": [0.5, 0.86], "collision": { "shape": "rect", "x": 3070, "y": 1760, "width": 260, "height": 105 } },
+    { "id": "court-sluice", "asset": "sluice-machine", "x": 3610, "y": 2480, "scale": 0.92, "anchor": [0.5, 0.88], "collision": { "shape": "rect", "x": 3460, "y": 2400, "width": 300, "height": 140 } },
+    { "id": "court-cargo-shrine", "asset": "cargo-shrine", "x": 4690, "y": 2180, "scale": 0.9, "anchor": [0.5, 0.9], "collision": { "shape": "rect", "x": 4550, "y": 2090, "width": 280, "height": 140 } },
+    { "id": "regent-gate", "asset": "regent-gate", "x": 4330, "y": 930, "scale": 1.15, "anchor": [0.5, 0.94], "collision": { "shape": "rect", "x": 4090, "y": 820, "width": 480, "height": 180 } },
+    { "id": "north-lantern-arch", "asset": "landing-arch", "x": 3730, "y": 520, "scale": 0.82, "anchor": [0.5, 0.9], "collision": { "shape": "rect", "x": 3610, "y": 450, "width": 240, "height": 120 } }
+  ],
+  "ambientEmitters": [
+    { "id": "west-canal-flow", "kind": "water", "x": 1350, "y": 820, "radius": 720, "speed": 0.5, "intensity": 0.72 },
+    { "id": "wharf-reflections", "kind": "reflection", "x": 1370, "y": 2440, "radius": 700, "speed": 0.32, "intensity": 0.78 },
+    { "id": "bazaar-lanterns", "kind": "glow", "x": 2580, "y": 1380, "radius": 760, "speed": 0.28, "intensity": 0.82 },
+    { "id": "east-canal-flow", "kind": "water", "x": 3200, "y": 1120, "radius": 730, "speed": 0.56, "intensity": 0.74 },
+    { "id": "court-reflections", "kind": "reflection", "x": 4140, "y": 2060, "radius": 780, "speed": 0.38, "intensity": 0.86 },
+    { "id": "regent-lanterns", "kind": "glow", "x": 4320, "y": 610, "radius": 680, "speed": 0.24, "intensity": 0.9 }
+  ]
+}

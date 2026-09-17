@@ -17,9 +17,9 @@ const requiredAssets = {
 };
 
 const explorationStages = [
-  { directory: 'stage-01', version: 'v5' },
-  { directory: 'stage-02', version: 'v1' },
-  { directory: 'stage-03', version: 'v1' },
+  { directory: 'stage-01', version: 'v6' },
+  { directory: 'stage-02', version: 'v6' },
+  { directory: 'stage-03', version: 'v6' },
 ];
 
 const textExtensions = new Set([
@@ -103,6 +103,13 @@ function readWebpSize(buffer) {
   throw new Error(`不支持的 WebP 数据块：${chunk}`);
 }
 
+function readImageSize(buffer) {
+  if (buffer.subarray(0, 8).toString('hex') === '89504e470d0a1a0a') {
+    return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+  }
+  return readWebpSize(buffer);
+}
+
 function openingTags(source, tagName) {
   return [...source.matchAll(new RegExp(`<${tagName}\\b[^>]*>`, 'gi'))]
     .map((match) => match[0]);
@@ -136,21 +143,34 @@ test('五张 v2 美术资产是真实且具有可用分辨率的栅格图片', a
   }
 });
 
-test('探索版按镜头加载三关地图块，不回退为单张放大贴图', async () => {
+test('探索版按镜头加载三关 v6 地表与环境遮罩，不回退旧地图', async () => {
   const source = await readFile(path.join(publicRoot, 'app.js'), 'utf8');
   for (const stage of explorationStages) {
     for (let row = 0; row < 4; row += 1) {
       for (let column = 0; column < 4; column += 1) {
-        const name = 'map-r' + row + '-c' + column + '-' + stage.version + '.webp';
-        const buffer = await readFile(path.join(publicRoot, 'assets', 'world', stage.directory, name));
-        assert.deepEqual(readWebpSize(buffer), { width: 1280, height: 720 });
+        const groundName = 'ground-r' + row + '-c' + column + '-' + stage.version + '.webp';
+        const ground = await readFile(path.join(publicRoot, 'assets', 'world', stage.directory, groundName));
+        assert.deepEqual(readWebpSize(ground), { width: 1280, height: 720 });
+        const maskName = 'ambient-mask-r' + row + '-c' + column + '-' + stage.version + '.png';
+        const mask = await readFile(path.join(publicRoot, 'assets', 'world', stage.directory, maskName));
+        assert.deepEqual(readImageSize(mask), { width: 320, height: 180 });
       }
     }
+    const surface = await readFile(path.join(publicRoot, 'assets', 'world', stage.directory, 'surface-v6.webp'));
+    const foreground = await readFile(path.join(publicRoot, 'assets', 'world', stage.directory, 'foreground-v6.webp'));
+    assert.deepEqual(readWebpSize(surface), { width: 1024, height: 1024 });
+    assert.deepEqual(readWebpSize(foreground), { width: 1536, height: 768 });
+    const manifest = JSON.parse(await readFile(path.join(publicRoot, 'assets', 'world', stage.directory, 'foreground-v6.json'), 'utf8'));
+    assert.ok(manifest && typeof manifest === 'object', stage.directory + ' 前景图集必须带有有效 JSON 索引');
     assert.ok(source.includes(stage.directory), '客户端地图注册表缺少 ' + stage.directory);
   }
   assert.match(source, /visibleTileRange\s*\(/, '客户端必须按相机视口计算可见地图块');
   assert.match(source, /stageTileCache|tileCache/, '客户端必须维护有限地图块缓存');
-  assert.match(source, /map-r/, '客户端必须按行列生成地图块路径');
+  assert.match(source, /ground-r/, '客户端必须按行列生成 v6 地表路径');
+  assert.match(source, /ambient-mask-r/, '客户端必须按行列生成环境遮罩路径');
+  assert.match(source, /surface-v6\.webp/, '客户端必须注册地表材质图集');
+  assert.match(source, /foreground-v6\.webp/, '客户端必须注册前景道具图集');
+  assert.doesNotMatch(source, /map-r\$\{|map-r\d|overview-v[15]/, '生产运行时不得再注册 v1/v5 旧地图');
   assert.doesNotMatch(source, /world-map-v4\.webp/, '生产地图不得继续加载旧的单张放大背景');
   assert.doesNotMatch(source, /for\s*\([^)]*row[^)]*\)[\s\S]{0,500}?drawImage\(assets\.arena/i, '世界地图不得继续逐格重复单屏竞技场');
 });
@@ -233,15 +253,57 @@ test('正式启动主页面分流到契约大厅、快速加入与玩法说明',
 
   const images = openingTags(html, 'img');
   for (const imageSource of [
-    'assets/world/stage-01/overview-v5.webp',
-    'assets/world/stage-02/overview-v1.webp',
-    'assets/world/stage-03/overview-v1.webp',
+    'assets/world/stage-01/overview-v6.webp',
+    'assets/world/stage-02/overview-v6.webp',
+    'assets/world/stage-03/overview-v6.webp?geometry=f92a',
   ]) {
     const escaped = imageSource.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const preview = images.find((tag) => hasAttribute(tag, 'src', new RegExp('^' + escaped + '$', 'i')));
     assert.ok(preview, '三章航路预览缺少 ' + imageSource);
     assert.ok(hasAttribute(preview, 'alt', /.+/), imageSource + ' 必须提供替代文本');
+    const stageKey = imageSource.match(/stage-\d{2}/)?.[0];
+    assert.ok(hasAttribute(preview, 'data-stage-overview', new RegExp('^' + stageKey + '$')), imageSource + ' 必须可被 Canvas 复用为低清全图');
   }
+});
+
+test('首章低清全图高优先级、出生列地块低优先级预加载', async () => {
+  const html = await readFile(indexPath, 'utf8');
+  const stage = JSON.parse(await readFile(path.join(projectRoot, 'src', 'world-v6', 'stage-01.json'), 'utf8'));
+  const links = openingTags(html, 'link');
+  const tileWidth = 1_280;
+  const tileHeight = 720;
+  const viewportWidth = 1_280;
+  const viewportHeight = 720;
+  const cameraX = Math.min(stage.world.width - viewportWidth / 2, Math.max(viewportWidth / 2, stage.spawn.x));
+  const cameraY = Math.min(stage.world.height - viewportHeight / 2, Math.max(viewportHeight / 2, stage.spawn.y));
+  const column = Math.floor(cameraX / tileWidth);
+  const firstRow = Math.floor((cameraY - viewportHeight / 2) / tileHeight);
+  const lastRow = Math.floor((cameraY + viewportHeight / 2 - 1) / tileHeight);
+  const resources = [
+    { href: 'assets/world/stage-01/overview-v6.webp', priority: 'high' },
+    ...Array.from({ length: lastRow - firstRow + 1 }, (_, index) => ({
+      href: `assets/world/stage-01/ground-r${firstRow + index}-c${column}-v6.webp`,
+      priority: 'low',
+    })),
+  ];
+  for (const { href, priority } of resources) {
+    const escaped = href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const preload = links.find((tag) => hasAttribute(tag, 'href', new RegExp('^' + escaped + '$', 'i')));
+    assert.ok(preload, `首屏缺少 ${href} 的 preload`);
+    assert.ok(hasAttribute(preload, 'rel', /^preload$/i), `${href} 必须使用 preload`);
+    assert.ok(hasAttribute(preload, 'as', /^image$/i), `${href} 必须声明 as=image`);
+    assert.ok(hasAttribute(preload, 'fetchpriority', new RegExp(`^${priority}$`, 'i')), `${href} 必须声明 ${priority} 请求优先级`);
+  }
+});
+
+test('版本化美术资产允许浏览器复用，不再每次启动都重新验证', async () => {
+  const headers = await readFile(path.join(publicRoot, '_headers'), 'utf8');
+  const assetRule = headers.match(/^\/assets\/\*\r?\n((?:[ \t]+[^\r\n]+(?:\r?\n|$))*)/m);
+  assert.ok(assetRule, 'Cloudflare 静态头规则必须覆盖 /assets/* 并包含缩进的响应头');
+  const cacheControl = assetRule[1].match(/^\s+Cache-Control:\s*public,\s*max-age=(\d+),\s*stale-while-revalidate=(\d+)\s*$/mi);
+  assert.ok(cacheControl, '版本化美术必须声明 public max-age');
+  assert.equal(Number(cacheControl[1]), 86_400, '可覆盖的 v6 美术缓存应保持一天，避免长期陈旧');
+  assert.ok(Number(cacheControl[2]) >= 3_600, '缓存过期时应允许至少一小时后台更新');
 });
 
 test('页面具备菜单与游戏所需的基础无障碍标记', async () => {
@@ -332,8 +394,9 @@ test('poll fallback stays smooth and never overlaps slow requests', async () => 
   const source = await readFile(path.join(publicRoot, 'app.js'), 'utf8');
 
   assert.match(source, /FALLBACK_POLL_INTERVAL_MS\s*=\s*180/);
-  assert.match(source, /MAX_LOCAL_PREDICTION_LEAD_MS\s*=\s*260/);
-  assert.match(source, /snapshotAge\s*>\s*MAX_LOCAL_PREDICTION_LEAD_MS/);
+  assert.match(source, /predictionHorizon\s*=\s*localPredictionHorizonMs\(runtime\.rtt\)/);
+  assert.match(source, /snapshotAge\s*<=\s*predictionHorizon/);
+  assert.doesNotMatch(source, /MAX_LOCAL_PREDICTION_LEAD_MS\s*=\s*260/);
   assert.match(source, /STATE_STALE_AFTER_MS\s*=\s*1000/);
   assert.match(source, /Date\.now\(\)\s*-\s*runtime\.lastStateAt\s*<=\s*STATE_STALE_AFTER_MS/);
   assert.match(source, /if\s*\(!runtime\.session\s*\|\|\s*runtime\.pollInFlight\)\s*return/);

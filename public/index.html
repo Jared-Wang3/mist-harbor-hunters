@@ -17,6 +17,9 @@
     <link rel="preload" href="assets/cover-v2.webp" as="image" type="image/webp" />
     <link rel="preload" href="assets/sprites-v2.webp" as="image" type="image/webp" />
     <link rel="preload" href="assets/icons-v2.webp" as="image" type="image/webp" />
+    <link rel="preload" href="assets/world/stage-01/overview-v6.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href="assets/world/stage-01/ground-r2-c0-v6.webp" as="image" type="image/webp" fetchpriority="low" />
+    <link rel="preload" href="assets/world/stage-01/ground-r3-c0-v6.webp" as="image" type="image/webp" fetchpriority="low" />
     <link rel="stylesheet" href="styles.css" />
     <script src="app.js" type="module"></script>
   </head>
@@ -127,25 +130,29 @@
               <div class="stage-route-preview">
                 <article class="stage-route-card">
                   <img
-                    src="assets/world/stage-01/overview-v5.webp"
+                    src="assets/world/stage-01/overview-v6.webp"
                     alt="晴潮雾港航路地形预览"
                     decoding="async"
+                    fetchpriority="high"
+                    data-stage-overview="stage-01"
                   />
                   <div><small>第一章</small><strong>晴潮雾港</strong></div>
                 </article>
                 <article class="stage-route-card">
                   <img
-                    src="assets/world/stage-02/overview-v1.webp"
+                    src="assets/world/stage-02/overview-v6.webp"
                     alt="赤灯潮市航路地形预览"
                     decoding="async"
+                    data-stage-overview="stage-02"
                   />
                   <div><small>第二章</small><strong>赤灯潮市</strong></div>
                 </article>
                 <article class="stage-route-card">
                   <img
-                    src="assets/world/stage-03/overview-v1.webp"
+                    src="assets/world/stage-03/overview-v6.webp?geometry=f92a"
                     alt="云汐天关航路地形预览"
                     decoding="async"
+                    data-stage-overview="stage-03"
                   />
                   <div><small>第三章</small><strong>云汐天关</strong></div>
                 </article>
@@ -283,6 +290,7 @@
                   <li><kbd>WASD</kbd> 移动</li>
                   <li><kbd>鼠标</kbd> 瞄准</li>
                   <li><kbd>左键 / J</kbd> 攻击</li>
+                  <li><kbd>Q</kbd> 施放角色技能</li>
                   <li><kbd>E / K</kbd> 互动与救援</li>
                   <li><kbd>Shift</kbd> 闪避</li>
                 </ul>
@@ -305,7 +313,7 @@
 
         <footer class="lobby-footer">
           <p><span aria-hidden="true">◆</span> 戴上耳机，循钟声而行</p>
-          <p>WASD 移动 · 鼠标瞄准 · 左键 / J / 空格攻击 · E / K 互动</p>
+          <p>WASD 移动 · 鼠标瞄准 · 左键 / J / 空格攻击 · Q 技能 · E / K 互动</p>
         </footer>
       </section>
 
@@ -336,7 +344,7 @@
               width="1600"
               height="900"
               tabindex="0"
-              aria-label="俯视角猎场。使用 WASD 或方向键移动，鼠标瞄准，左键、J 或空格攻击，E 或 K 键互动。"
+              aria-label="俯视角猎场。使用 WASD 或方向键移动，鼠标瞄准，左键、J 或空格攻击，Q 键施放角色技能，E 或 K 键互动。"
             >
               你的浏览器不支持 Canvas，无法进入雾港猎场。
             </canvas>
@@ -420,6 +428,12 @@
               </div>
 
               <div class="skill-hud" aria-label="技能与操作提示">
+                <div id="skillSlot" class="skill-slot role-skill" aria-label="守潮阵已就绪">
+                  <span id="skillIcon" class="role-skill-glyph" aria-hidden="true">守</span>
+                  <span id="skillCooldown" class="skill-cooldown" aria-hidden="true"></span>
+                  <kbd>Q</kbd>
+                  <small id="skillName">守潮阵</small>
+                </div>
                 <div class="skill-slot primary-skill">
                   <span id="primarySkillIcon" class="asset-icon icon-slash" aria-hidden="true"></span>
                   <kbd>左键</kbd>
@@ -443,6 +457,11 @@
                 </div>
                 <div class="right-control-cluster">
                   <div class="touch-utilities">
+                    <button id="touchSkill" class="touch-button skill" type="button" aria-label="施放守潮阵">
+                      <span id="touchSkillIcon" class="touch-skill-glyph" aria-hidden="true">守</span>
+                      <small id="touchSkillName">技能</small>
+                      <b id="touchSkillCooldown" class="touch-skill-cooldown" aria-hidden="true"></b>
+                    </button>
                     <button id="touchDodge" class="touch-button dodge" type="button" aria-label="闪避">闪</button>
                     <button id="touchInteract" class="touch-button interact" type="button" aria-label="互动或救援">
                       <span class="asset-icon icon-revive" aria-hidden="true"></span><small>互动</small>
@@ -456,7 +475,7 @@
                 </div>
               </div>
 
-              <p class="desktop-controls">WASD / 方向键 移动　·　鼠标 瞄准　·　左键 / J / 空格 攻击　·　E / K 互动　·　Shift 闪避</p>
+              <p class="desktop-controls">WASD / 方向键 移动　·　鼠标 瞄准　·　左键 / J / 空格 攻击　·　Q 技能　·　E / K 互动　·　Shift 闪避</p>
             </div>
           </div>
         </main>

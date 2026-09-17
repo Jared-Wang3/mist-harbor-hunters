@@ -1,0 +1,92 @@
+{
+  "version": 6,
+  "cellSize": 384,
+  "columns": 4,
+  "rows": 2,
+  "assets": {
+    "sky-dock": {
+      "column": 0,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.9
+      ],
+      "content": [
+        56,
+        20,
+        272,
+        344
+      ]
+    },
+    "bridge-anchor": {
+      "column": 1,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.9
+      ],
+      "content": [
+        45,
+        20,
+        294,
+        344
+      ]
+    },
+    "cloud-bell": {
+      "column": 2,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.94
+      ],
+      "content": [
+        24,
+        32,
+        336,
+        332
+      ]
+    },
+    "beacon-tower": {
+      "column": 3,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.94
+      ],
+      "content": [
+        142,
+        20,
+        101,
+        344
+      ]
+    },
+    "heavenly-altar": {
+      "column": 0,
+      "row": 1,
+      "anchor": [
+        0.5,
+        0.9
+      ],
+      "content": [
+        24,
+        118,
+        336,
+        246
+      ]
+    },
+    "return-gate": {
+      "column": 1,
+      "row": 1,
+      "anchor": [
+        0.5,
+        0.95
+      ],
+      "content": [
+        24,
+        72,
+        336,
+        292
+      ]
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "version": 6,
+  "cellSize": 384,
+  "columns": 4,
+  "rows": 2,
+  "assets": {
+    "hunter-hut": {
+      "column": 0,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.88
+      ],
+      "content": [
+        43,
+        20,
+        298,
+        344
+      ]
+    },
+    "broken-pier": {
+      "column": 1,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.88
+      ],
+      "content": [
+        24,
+        79,
+        336,
+        285
+      ]
+    },
+    "reef-cluster": {
+      "column": 2,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.82
+      ],
+      "content": [
+        30,
+        20,
+        324,
+        344
+      ]
+    },
+    "flood-wall": {
+      "column": 3,
+      "row": 0,
+      "anchor": [
+        0.5,
+        0.82
+      ],
+      "content": [
+        24,
+        122,
+        336,
+        242
+      ]
+    },
+    "market-stall": {
+      "column": 0,
+      "row": 1,
+      "anchor": [
+        0.5,
+        0.9
+      ],
+      "content": [
+        46,
+        20,
+        292,
+        344
+      ]
+    },
+    "lighthouse-base": {
+      "column": 1,
+      "row": 1,
+      "anchor": [
+        0.5,
+        0.9
+      ],
+      "content": [
+        24,
+        63,
+        336,
+        301
+      ]
+    }
+  }
+}
